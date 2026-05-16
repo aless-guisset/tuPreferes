@@ -10,7 +10,8 @@
           <span class="font-display logo-text">TuPréfères</span>
         </Link>
 
-        <!-- Search -->
+        
+      <!-- Search -->
         <div class="nav-search">
           <SearchBar />
         </div>
@@ -23,7 +24,7 @@
           </button>
 
           <template v-if="$page.props.auth.user">
-            <Link :href="route('questions.create')" class="btn-primary">
+            <Link :href="route('groups.create')" class="btn-primary">
               <PlusIcon /> Créer
             </Link>
             <Link :href="route('profile.show')" class="avatar-btn">
@@ -60,16 +61,16 @@
         </Link>
 
         <!-- Créer (centre, accent) -->
-        <Link :href="route('questions.create')" class="mobile-nav-btn mobile-nav-create">
+        <Link :href="route('groups.create')" class="mobile-nav-btn mobile-nav-create">
           <div class="create-bubble">
             <PlusIcon />
           </div>
         </Link>
 
         <!-- Historique -->
-        <Link :href="route('profile.show') + '#history'" class="mobile-nav-btn">
-          <ClockIcon />
-          <span>Historique</span>
+        <Link :href="route('groups.index')" class="mobile-nav-btn" :class="{ active: isRoute('groups.index') }">
+          <span style="font-size:1.2rem">📦</span>
+          <span>Groupes</span>
         </Link>
 
         <!-- Profil -->
@@ -166,6 +167,8 @@ const focusSearch = computed(() => new URLSearchParams(window.location.search).h
   letter-spacing: -.02em;
 }
 .nav-search { flex: 1; max-width: 480px; }
+.nav-link { color: var(--color-text-muted); text-decoration: none; font-size: .875rem; font-weight: 500; padding: .4rem .75rem; border-radius: var(--radius-sm); transition: color .2s, background .2s; white-space: nowrap; }
+.nav-link:hover { color: var(--color-accent); background: var(--color-accent-soft); }
 .nav-actions {
   display: flex;
   align-items: center;
@@ -270,3 +273,4 @@ const focusSearch = computed(() => new URLSearchParams(window.location.search).h
   .main-content { padding: 1rem .75rem; }
 }
 </style>
+<!-- patch groupes -->

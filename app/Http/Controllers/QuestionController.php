@@ -1,16 +1,15 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Http\Requests\SearchRequest;
-use App\Http\Requests\StoreQuestionRequest;
 use App\Http\Requests\VoteRequest;
 use App\Models\Like;
 use App\Models\Question;
+use App\Models\QuestionGroup;
 use App\Models\QuestionHistory;
 use App\Models\QuestionOption;
 use App\Models\Share;
 use App\Models\Vote;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -19,301 +18,201 @@ use Inertia\Response;
 
 class QuestionController extends Controller
 {
-    // ─── Helpers privés ───────────────────────────────────────────────────────
-
-    /**
-     * Formate une question pour le front, avec stats et état utilisateur.
-     */
-    private function formatQuestion(Question $question): array
+    private function formatQuestion(Question $q): array
     {
-        $user      = Auth::user();
-        $totalVotes = $question->votes()->count();
-
-        $options = $question->options->map(function (QuestionOption $option) use ($totalVotes) {
-            $count      = $option->votes()->count();
-            $percentage = $totalVotes > 0 ? round(($count / $totalVotes) * 100) : 0;
-
-            return [
-                'id'         => $option->id,
-                'label'      => $option->label,
-                'image'      => $option->image_url,
-                'audio'      => $option->audio_url,
-                'order'      => $option->order,
-                'vote_count' => $count,
-                'percentage' => $percentage,
-            ];
+        $user  = Auth::user();
+        $total = $q->votes()->count();
+        $opts  = $q->options->map(function (QuestionOption $o) use ($total) {
+            $c = $o->votes()->count();
+            return ['id'=>$o->id,'label'=>$o->label,'image'=>$o->image_url,'audio'=>$o->audio_url,'order'=>$o->order,'vote_count'=>$c,'percentage'=>$total>0?round($c/$total*100):0];
         });
-
-        $userVote = $user
-            ? $question->votes()->where('user_id', $user->id)->value('question_option_id')
-            : null;
-
-        $hasLiked = $user
-            ? $question->likes()->where('user_id', $user->id)->exists()
-            : false;
-
+        $userVote = $user ? $q->votes()->where('user_id',$user->id)->value('question_option_id') : null;
+        $hasLiked = $user ? $q->likes()->where('user_id',$user->id)->exists() : false;
         $author = null;
-        if ($question->user && ! $question->is_anonymous) {
-            $author = [
-                'id'         => $question->user->id,
-                'name'       => $question->user->name,
-                'username'   => $question->user->username,
-                'avatar_url' => $question->user->avatar_url,
-            ];
+        if ($q->user && !$q->is_anonymous) {
+            $author = ['id'=>$q->user->id,'name'=>$q->user->name,'username'=>$q->user->username,'avatar_url'=>$q->user->avatar_url];
         }
-
         return [
-            'id'          => $question->id,
-            'title'       => $question->title,
-            'category'    => $question->category,
-            'options'     => $options,
-            'total_votes' => $totalVotes,
-            'total_likes' => $question->likes()->count(),
-            'total_shares'=> $question->shares()->count(),
-            'user_vote'   => $userVote,
-            'has_liked'   => $hasLiked,
-            'author'      => $author,
-            'created_at'  => $question->created_at->diffForHumans(),
+            'id'=>$q->id,'title'=>$q->title,'category'=>$q->category,
+            'options'=>$opts,'total_votes'=>$total,
+            'total_likes'=>$q->likes()->count(),'total_shares'=>$q->shares()->count(),
+            'user_vote'=>$userVote,'has_liked'=>$hasLiked,'author'=>$author,
+            'created_at'=>$q->created_at->diffForHumans(),
+            'item_type'=>'question',
         ];
     }
 
-    /**
-     * Enregistre la question dans l'historique de l'utilisateur connecté.
-     */
-    private function trackHistory(Question $question): void
+    private function formatGroup(QuestionGroup $g): array
     {
-        if (! Auth::check()) {
-            return;
+        $user = Auth::user();
+        $progress = $user ? \App\Models\GroupProgress::where('user_id',$user->id)->where('group_id',$g->id)->first() : null;
+        $author = null;
+        if ($g->user && !$g->is_anonymous) {
+            $author = ['id'=>$g->user->id,'name'=>$g->user->name,'username'=>$g->user->username,'avatar_url'=>$g->user->avatar_url];
         }
+        // Stats éliminatoire
+        $winnerStats = $g->type === 'elimination' ? $g->winner_stats : [];
 
-        QuestionHistory::updateOrCreate(
-            ['user_id' => Auth::id(), 'question_id' => $question->id],
-            ['viewed_at' => now()]
-        );
+        return [
+            'id'=>$g->id,'title'=>$g->title,'description'=>$g->description,
+            'type'=>$g->type,'category'=>$g->category ?? 'divers',
+            'total_questions'=>$g->questions_count ?? $g->questions()->count(),
+            'total_items'=>$g->eliminationItems()->count(),
+            'current_position'=>$progress?->current_position ?? 0,
+            'completed'=>$progress?->completed ?? false,
+            'author'=>$author,'created_at'=>$g->created_at->diffForHumans(),
+            'item_type'=>'group',
+            'winner_stats'=>$winnerStats,
+        ];
     }
 
-    // ─── Actions publiques ────────────────────────────────────────────────────
+    private function trackHistory(Question $q): void
+    {
+        if (!Auth::check()) return;
+        QuestionHistory::updateOrCreate(['user_id'=>Auth::id(),'question_id'=>$q->id],['viewed_at'=>now()]);
+    }
 
-    /**
-     * Page d'accueil — flux de questions.
-     */
     public function index(SearchRequest $request): Response
     {
-        $query = Question::published()
-            ->with(['user', 'options'])
-            ->withCount(['votes', 'likes']);
+        $search   = $request->validated('q');
+        $category = $request->validated('category');
+        $sort     = $request->validated('sort', 'recent');
+        $type     = $request->input('type'); // simple, group, elimination
 
-        if ($search = $request->validated('q')) {
-            $query->search($search);
+        // ── Questions simples ─────────────────────────────────────────────
+        $qQuery = Question::published()
+            ->where('question_type', 'simple')
+            ->orWhereNull('question_type')
+            ->with(['user','options'])
+            ->withCount(['votes','likes']);
+
+        if ($search)   $qQuery->search($search);
+        if ($category) $qQuery->byCategory($category);
+
+        // ── Groupes ───────────────────────────────────────────────────────
+        $gQuery = QuestionGroup::where('is_published', true)
+            ->with(['user'])
+            ->withCount('questions');
+
+        if ($category) $gQuery->where('category', $category);
+        if ($search)   $gQuery->where('title', 'like', "%{$search}%");
+        if ($type === 'group')       $gQuery->where('type', 'group');
+        if ($type === 'elimination') $gQuery->where('type', 'elimination');
+
+        // Récupérer et fusionner
+        $questions = $qQuery->latest()->get()->map(fn($q) => $this->formatQuestion($q));
+        $groups    = $gQuery->latest()->get()->map(fn($g) => $this->formatGroup($g));
+
+        // Filtrer par type si demandé
+        if ($type === 'simple') {
+            $allItems = $questions;
+        } elseif ($type === 'group' || $type === 'elimination') {
+            $allItems = $groups->filter(fn($g) => $g['type'] === $type)->values();
+        } else {
+            $allItems = $questions->concat($groups);
         }
 
-        if ($category = $request->validated('category')) {
-            $query->byCategory($category);
-        }
-
-        $sort = $request->validated('sort', 'recent');
-        match ($sort) {
-            'popular' => $query->orderByDesc('likes_count'),
-            'votes'   => $query->orderByDesc('votes_count'),
-            default   => $query->latest(),
+        // Trier
+        $allItems = match($sort) {
+            'popular' => $allItems->sortByDesc('total_likes'),
+            'votes'   => $allItems->sortByDesc('total_votes'),
+            default   => $allItems->sortByDesc('created_at'),
         };
+        $allItems = $allItems->values();
 
-        $questions = $query->paginate(10)->through(
-            fn ($q) => $this->formatQuestion($q)
-        );
+        // Paginer manuellement
+        $perPage = 10;
+        $page    = (int) request()->input('page', 1);
+        $total   = $allItems->count();
+        $items   = $allItems->slice(($page - 1) * $perPage, $perPage)->values();
 
-        // Suggestions pour les utilisateurs connectés
+        $paginated = [
+            'data'         => $items,
+            'current_page' => $page,
+            'last_page'    => (int) ceil($total / $perPage),
+            'total'        => $total,
+        ];
+
+        // Suggestions
         $suggestions = [];
         if (Auth::check()) {
             $answeredIds = Vote::where('user_id', Auth::id())->pluck('question_id');
             $suggestions = Question::published()
+                ->where('question_type', 'simple')
                 ->whereNotIn('id', $answeredIds)
-                ->with(['user', 'options'])
-                ->inRandomOrder()
-                ->limit(5)
-                ->get()
-                ->map(fn ($q) => $this->formatQuestion($q));
+                ->with(['user','options'])
+                ->inRandomOrder()->limit(5)->get()
+                ->map(fn($q) => $this->formatQuestion($q));
         }
 
         return Inertia::render('Questions/Index', [
-            'questions'  => $questions,
-            'suggestions'=> $suggestions,
-            'filters'    => $request->validated(),
-            'categories' => Question::distinct()->pluck('category'),
+            'questions'   => $paginated,
+            'suggestions' => $suggestions,
+            'filters'     => array_merge($request->validated(), ['type' => $type]),
+            'categories'  => ['amour','aventure','nourriture','technologie','voyage','sport','musique','cinéma','divers'],
         ]);
     }
 
-    /**
-     * Affiche une question en détail.
-     */
     public function show(Question $question): Response
     {
         abort_unless($question->is_published, 404);
-
         $this->trackHistory($question);
-
-        $question->load(['user', 'options']);
-
-        return Inertia::render('Questions/Show', [
-            'question' => $this->formatQuestion($question),
-        ]);
+        $question->load(['user','options']);
+        return Inertia::render('Questions/Show', ['question' => $this->formatQuestion($question)]);
     }
 
-    /**
-     * Formulaire de création.
-     */
     public function create(): Response
     {
         return Inertia::render('Questions/Create');
     }
 
-    /**
-     * Enregistre une nouvelle question.
-     */
-    public function store(StoreQuestionRequest $request): RedirectResponse
+    public function store(\App\Http\Requests\StoreQuestionRequest $request): RedirectResponse
     {
         $data = $request->validated();
-
-        $question = Question::create([
-            'user_id'      => Auth::id(),
-            'title'        => $data['title'] ?? null,
-            'category'     => $data['category'],
-            'is_anonymous' => $data['is_anonymous'] ?? false,
-            'is_published' => true,
-        ]);
-
-        foreach ($data['options'] as $index => $optionData) {
-            $imagePath = null;
-            $audioPath = null;
-
-            if (isset($optionData['image']) && $optionData['image'] instanceof \Illuminate\Http\UploadedFile) {
-                $imagePath = $optionData['image']->store('questions/images', 'public');
-            }
-
-            if (isset($optionData['audio']) && $optionData['audio'] instanceof \Illuminate\Http\UploadedFile) {
-                $audioPath = $optionData['audio']->store('questions/audio', 'public');
-            }
-
-            QuestionOption::create([
-                'question_id' => $question->id,
-                'label'       => $optionData['label'],
-                'image'       => $imagePath,
-                'audio'       => $audioPath,
-                'order'       => $index,
-            ]);
+        $q = Question::create(['user_id'=>Auth::id(),'title'=>$data['title']??null,'category'=>$data['category'],'is_anonymous'=>$data['is_anonymous']??false,'is_published'=>true,'question_type'=>'simple']);
+        foreach ($data['options'] as $i=>$opt) {
+            QuestionOption::create(['question_id'=>$q->id,'label'=>$opt['label'],'image'=>isset($opt['image'])&&$opt['image'] instanceof \Illuminate\Http\UploadedFile?$opt['image']->store('questions/images','public'):null,'audio'=>isset($opt['audio'])&&$opt['audio'] instanceof \Illuminate\Http\UploadedFile?$opt['audio']->store('questions/audio','public'):null,'order'=>$i]);
         }
-
-        return redirect()->route('questions.show', $question)
-            ->with('success', 'Ta question a été créée avec succès !');
+        return redirect()->route('questions.show',$q)->with('success','Question créée !');
     }
 
-    /**
-     * Supprime une question (auteur ou admin seulement).
-     */
     public function destroy(Question $question): RedirectResponse
     {
         abort_unless($question->user_id === Auth::id(), 403);
-
-        // Supprime les fichiers associés
-        foreach ($question->options as $option) {
-            if ($option->image) {
-                Storage::disk('public')->delete($option->image);
-            }
-            if ($option->audio) {
-                Storage::disk('public')->delete($option->audio);
-            }
+        foreach ($question->options as $o) {
+            if ($o->image) Storage::disk('public')->delete($o->image);
+            if ($o->audio) Storage::disk('public')->delete($o->audio);
         }
-
         $question->delete();
-
-        return redirect()->route('questions.index')
-            ->with('success', 'Question supprimée.');
+        return redirect()->route('questions.index')->with('success','Question supprimée.');
     }
 
-    // ─── Actions d'interaction ────────────────────────────────────────────────
-
-    /**
-     * Vote pour une option.
-     */
-    public function vote(VoteRequest $request, Question $question): \Illuminate\Http\JsonResponse
+    public function vote(VoteRequest $request, Question $question): JsonResponse
     {
         $optionId = $request->validated('option_id');
-
-        // Vérifie que l'option appartient bien à cette question
-        abort_unless(
-            $question->options->pluck('id')->contains($optionId),
-            422,
-            'Cette option n\'appartient pas à cette question.'
-        );
-
-        // Empêche le double vote
-        $existing = Vote::where('user_id', Auth::id())
-            ->where('question_id', $question->id)
-            ->first();
-
-        if ($existing) {
-            return response()->json(['message' => 'Vous avez déjà répondu à cette question.'], 422);
-        }
-
-        Vote::create([
-            'user_id'            => Auth::id(),
-            'question_id'        => $question->id,
-            'question_option_id' => $optionId,
-        ]);
-
-        // Recharge les stats
+        abort_unless($question->options->pluck('id')->contains($optionId), 422);
+        if (Vote::where('user_id',Auth::id())->where('question_id',$question->id)->exists())
+            return response()->json(['message'=>'Déjà répondu.'], 422);
+        Vote::create(['user_id'=>Auth::id(),'question_id'=>$question->id,'question_option_id'=>$optionId]);
         $question->load('options');
-        $formatted = $this->formatQuestion($question);
-
-        return response()->json([
-            'message'  => 'Vote enregistré !',
-            'question' => $formatted,
-        ]);
+        $total = $question->votes()->count();
+        $opts  = $question->options->map(function($o) use($total) {
+            $c = $o->votes()->count();
+            return ['id'=>$o->id,'label'=>$o->label,'image'=>$o->image_url,'audio'=>$o->audio_url,'order'=>$o->order,'vote_count'=>$c,'percentage'=>$total>0?round($c/$total*100):0];
+        });
+        return response()->json(['message'=>'Vote enregistré !','question'=>array_merge($this->formatQuestion($question),['options'=>$opts,'total_votes'=>$total])]);
     }
 
-    /**
-     * Toggle like sur une question.
-     */
-    public function toggleLike(Question $question): \Illuminate\Http\JsonResponse
+    public function toggleLike(Question $question): JsonResponse
     {
-        $like = Like::where('user_id', Auth::id())
-            ->where('question_id', $question->id)
-            ->first();
-
-        if ($like) {
-            $like->delete();
-            $liked = false;
-        } else {
-            Like::create([
-                'user_id'     => Auth::id(),
-                'question_id' => $question->id,
-            ]);
-            $liked = true;
-        }
-
-        return response()->json([
-            'liked'       => $liked,
-            'total_likes' => $question->likes()->count(),
-        ]);
+        $like = Like::where('user_id',Auth::id())->where('question_id',$question->id)->first();
+        $like ? $like->delete() : Like::create(['user_id'=>Auth::id(),'question_id'=>$question->id]);
+        return response()->json(['liked'=>!$like,'total_likes'=>$question->likes()->count()]);
     }
 
-    /**
-     * Enregistre un partage.
-     */
-    public function share(Question $question): \Illuminate\Http\JsonResponse
+    public function share(Question $question): JsonResponse
     {
-        $platform = request()->input('platform', 'link');
-
-        Share::create([
-            'user_id'     => Auth::id(),
-            'question_id' => $question->id,
-            'platform'    => $platform,
-        ]);
-
-        return response()->json([
-            'message'      => 'Partage enregistré.',
-            'total_shares' => $question->shares()->count(),
-            'share_url'    => route('questions.show', $question),
-        ]);
+        Share::create(['user_id'=>Auth::id(),'question_id'=>$question->id,'platform'=>request()->input('platform','link')]);
+        return response()->json(['total_shares'=>$question->shares()->count(),'share_url'=>route('questions.show',$question)]);
     }
 }

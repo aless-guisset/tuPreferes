@@ -42,3 +42,17 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profil', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profil', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+// ─── Groupes ──────────────────────────────────────────────────────────────────
+use App\Http\Controllers\QuestionGroupController;
+
+Route::get('/groupes', [QuestionGroupController::class, 'index'])->name('groups.index');
+Route::get('/groupe/{group}', [QuestionGroupController::class, 'show'])->name('groups.show');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/creer-groupe', [QuestionGroupController::class, 'create'])->name('groups.create');
+    Route::post('/groupes', [QuestionGroupController::class, 'store'])->name('groups.store');
+    Route::post('/groupe/{group}/question/{question}/voter', [QuestionGroupController::class, 'voteInGroup'])->name('groups.vote');
+    Route::post('/groupe/{group}/elimination/start',  [QuestionGroupController::class, 'startElimination'])->name('groups.elimination.start');
+    Route::post('/groupe/{group}/elimination/choose', [QuestionGroupController::class, 'chooseElimination'])->name('groups.elimination.choose');
+});
