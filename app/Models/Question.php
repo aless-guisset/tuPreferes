@@ -51,6 +51,7 @@ class Question extends Model
         return $this->hasMany(Share::class);
     }
 
+    public function reports() { return $this->morphMany(Report::class, 'reportable'); }
     public function histories(): HasMany
     {
         return $this->hasMany(QuestionHistory::class);

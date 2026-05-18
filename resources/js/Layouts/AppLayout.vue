@@ -7,7 +7,7 @@
         <!-- Logo -->
         <Link :href="route('questions.index')" class="logo">
           <span class="logo-icon">🤔</span>
-          <span class="font-display logo-text">TuPréfères</span>
+          <span class="font-display logo-text">{{ t('app.name') }}</span>
         </Link>
 
         
@@ -18,12 +18,14 @@
 
         <!-- Right actions -->
         <div class="nav-actions">
+          <LocaleSwitcher />
           <button class="btn-ghost icon-btn" @click="toggleTheme" :title="theme === 'dark' ? 'Mode clair' : 'Mode sombre'">
             <SunIcon v-if="theme === 'dark'" />
             <MoonIcon v-else />
           </button>
 
           <template v-if="$page.props.auth.user">
+            <Link v-if="$page.props.auth.user.is_admin" :href="route('admin.index')" class="btn-ghost admin-btn">🛡️ Admin</Link>
             <Link :href="route('groups.create')" class="btn-primary">
               <PlusIcon /> Créer
             </Link>
@@ -33,8 +35,8 @@
           </template>
 
           <template v-else>
-            <Link :href="route('login')" class="btn-ghost">Connexion</Link>
-            <Link :href="route('register')" class="btn-primary">Inscription</Link>
+            <Link :href="route('login')" class="btn-ghost">{{ t('nav.login') }}</Link>
+            <Link :href="route('register')" class="btn-primary">{{ t('nav.register') }}</Link>
           </template>
         </div>
       </div>
@@ -48,16 +50,17 @@
     <!-- ── Mobile Bottom Nav ─────────────────────────────────────────────── -->
     <nav class="mobile-nav pb-safe">
       <template v-if="$page.props.auth.user">
+            <Link v-if="$page.props.auth.user.is_admin" :href="route('admin.index')" class="btn-ghost admin-btn">🛡️ Admin</Link>
         <!-- Accueil -->
         <Link :href="route('questions.index')" class="mobile-nav-btn" :class="{ active: isRoute('questions.index') }">
           <HomeIcon />
-          <span>Accueil</span>
+          <span>{{ t('nav.home') }}</span>
         </Link>
 
         <!-- Recherche -->
         <Link :href="route('questions.index') + '?focus=search'" class="mobile-nav-btn" :class="{ active: isRoute('questions.index') && focusSearch }">
           <SearchIcon />
-          <span>Explorer</span>
+          <span>{{ t('nav.explore') }}</span>
         </Link>
 
         <!-- Créer (centre, accent) -->
@@ -70,13 +73,13 @@
         <!-- Historique -->
         <Link :href="route('groups.index')" class="mobile-nav-btn" :class="{ active: isRoute('groups.index') }">
           <span style="font-size:1.2rem">📦</span>
-          <span>Groupes</span>
+          <span>{{ t('nav.groups') }}</span>
         </Link>
 
         <!-- Profil -->
         <Link :href="route('profile.show')" class="mobile-nav-btn" :class="{ active: isRoute('profile.show') }">
           <img :src="$page.props.auth.user.avatar_url" class="mobile-avatar" />
-          <span>Profil</span>
+          <span>{{ t('nav.profile') }}</span>
         </Link>
       </template>
 
@@ -84,7 +87,7 @@
         <!-- Non connecté : Recherche + Connexion -->
         <Link :href="route('questions.index')" class="mobile-nav-btn" :class="{ active: isRoute('questions.index') }">
           <HomeIcon />
-          <span>Accueil</span>
+          <span>{{ t('nav.home') }}</span>
         </Link>
         <div class="mobile-nav-spacer" />
         <Link :href="route('login')" class="mobile-nav-btn mobile-nav-create">
@@ -96,7 +99,7 @@
         <button class="mobile-nav-btn" @click="toggleTheme">
           <SunIcon v-if="theme === 'dark'" />
           <MoonIcon v-else />
-          <span>Thème</span>
+          <span>{{ t('nav.theme_dark') }}</span>
         </button>
       </template>
     </nav>
@@ -112,6 +115,8 @@
 <script setup>
 import { computed } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
+import LocaleSwitcher from '@/Components/LocaleSwitcher.vue'
+import { useI18n } from '@/Composables/useI18n'
 import { useTheme } from '@/Composables/useTheme'
 import SearchBar from '@/Components/SearchBar.vue'
 import ToastContainer from '@/Components/ToastContainer.vue'
@@ -127,6 +132,7 @@ import SunIcon from '@/Components/Icons/SunIcon.vue'
 import MoonIcon from '@/Components/Icons/MoonIcon.vue'
 
 const { theme, toggle: toggleTheme } = useTheme()
+const { t } = useI18n()
 const page = usePage()
 
 const isRoute = (name) => route().current(name)

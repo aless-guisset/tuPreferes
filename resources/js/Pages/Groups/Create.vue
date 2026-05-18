@@ -2,8 +2,8 @@
   <AppLayout>
     <div class="create-layout">
       <div class="create-header">
-        <Link :href="route('groups.index')" class="back-link">← Retour</Link>
-        <h1 class="font-display create-title">Créer un Tu Préfères</h1>
+        <Link :href="route('groups.index')" class="back-link">{{ t("common.back") }}</Link>
+        <h1 class="font-display create-title">{{ t("create.title") }}</h1>
       </div>
 
       <!-- Sélecteur de type -->
@@ -49,7 +49,7 @@
           <span>Publier anonymement</span>
         </label>
         <div class="form-actions">
-          <Link :href="route('questions.index')" class="btn-ghost">Annuler</Link>
+          <Link :href="route('questions.index')" class="btn-ghost">{{ t("create.cancel") }}</Link>
           <button type="submit" class="btn-primary" :disabled="loading">{{ loading ? '⏳...' : '🚀 Publier' }}</button>
         </div>
       </form>
@@ -95,7 +95,7 @@
           <span>Publier anonymement</span>
         </label>
         <div class="form-actions">
-          <Link :href="route('groups.index')" class="btn-ghost">Annuler</Link>
+          <Link :href="route('groups.index')" class="btn-ghost">{{ t("create.cancel") }}</Link>
           <button type="submit" class="btn-primary" :disabled="loading || form.groupQuestions.length < 2">{{ loading ? '⏳...' : '🚀 Créer le groupe' }}</button>
         </div>
       </form>
@@ -113,14 +113,14 @@
         <div class="field">
           <label class="field-label">Ordre des duels</label>
           <div class="order-btns">
-            <button type="button" class="order-btn" :class="{ active: form.elimOrder === 'sequential' }" @click="form.elimOrder = 'sequential'">📋 Dans l'ordre</button>
-            <button type="button" class="order-btn" :class="{ active: form.elimOrder === 'random' }" @click="form.elimOrder = 'random'">🎲 Aléatoire</button>
+            <button type="button" class="order-btn" :class="{ active: form.elimOrder === 'sequential' }" @click="form.elimOrder = 'sequential'">📋 {{ t("elimination.order_sequential") }}</button>
+            <button type="button" class="order-btn" :class="{ active: form.elimOrder === 'random' }" @click="form.elimOrder = 'random'">🎲 {{ t("elimination.order_random") }}</button>
           </div>
         </div>
         <div class="elim-section">
           <div class="elim-header">
             <span class="font-display">Items ({{ form.elimItems.length }})</span>
-            <span class="elim-hint">min 3 · max 64</span>
+            <span class="elim-hint">{{ t("create.items_hint") }}</span>
             <button type="button" class="btn-ghost btn-sm" @click="addItem">+ Ajouter</button>
           </div>
           <div class="elim-list">
@@ -137,7 +137,7 @@
           <span>Publier anonymement</span>
         </label>
         <div class="form-actions">
-          <Link :href="route('groups.index')" class="btn-ghost">Annuler</Link>
+          <Link :href="route('groups.index')" class="btn-ghost">{{ t("create.cancel") }}</Link>
           <button type="submit" class="btn-primary" :disabled="loading || form.elimItems.length < 3">{{ loading ? '⏳...' : '🏆 Créer le tournoi' }}</button>
         </div>
       </form>
@@ -147,16 +147,18 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
+import { useI18n } from '@/Composables/useI18n'
 import { Link, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { useToast } from '@/Composables/useToast'
 
 const { add: toast } = useToast()
+const { t } = useI18n()
 const loading = ref(false)
 
 const types = [
-  { id: 'simple',      icon: '⚡', label: 'Simple',      desc: '2 options, 1 choix' },
-  { id: 'group',       icon: '📦', label: 'Groupe',       desc: 'Plusieurs questions à la chaîne' },
+  { id: 'simple',      icon: '⚡', label: 'Simple',      desc: '{{ t("create.type_simple_desc") }}' },
+  { id: 'group',       icon: '📦', label: 'Groupe',       desc: '{{ t("create.type_group_desc") }}' },
   { id: 'elimination', icon: '🏆', label: 'Éliminatoire', desc: 'Tournoi jusqu\'au dernier' },
 ]
 
@@ -203,7 +205,7 @@ const submitSimple = () => {
   d.append('is_anonymous', form.is_anonymous ? '1' : '0')
   d.append('type', 'simple')
   form.options.forEach((o, i) => { d.append(`options[${i}][label]`, o.label); if (o.image) d.append(`options[${i}][image]`, o.image); if (o.audio) d.append(`options[${i}][audio]`, o.audio) })
-  router.post(route('groups.store'), d, { onError: (e) => toast('Corrige les erreurs.', 'error'), onFinish: () => { loading.value = false } })
+  router.post(route('groups.store'), d, { onError: (e) => toast('t("create.fix_errors")', 'error'), onFinish: () => { loading.value = false } })
 }
 
 const submitGroup = () => {
@@ -215,7 +217,7 @@ const submitGroup = () => {
   d.append('category', form.category)
   d.append('is_anonymous', form.is_anonymous ? '1' : '0')
   form.groupQuestions.forEach((q, qi) => { if (q.title) d.append(`questions[${qi}][title]`, q.title); q.options.forEach((o, oi) => { d.append(`questions[${qi}][options][${oi}][label]`, o.label); if (o.image) d.append(`questions[${qi}][options][${oi}][image]`, o.image) }) })
-  router.post(route('groups.store'), d, { onError: (e) => toast('Corrige les erreurs.', 'error'), onFinish: () => { loading.value = false } })
+  router.post(route('groups.store'), d, { onError: (e) => toast('t("create.fix_errors")', 'error'), onFinish: () => { loading.value = false } })
 }
 
 const submitElim = () => {
@@ -227,7 +229,7 @@ const submitElim = () => {
   d.append('order', form.elimOrder)
   d.append('is_anonymous', form.is_anonymous ? '1' : '0')
   form.elimItems.forEach((item, i) => { d.append(`items[${i}][label]`, item.label); if (item.image) d.append(`items[${i}][image]`, item.image) })
-  router.post(route('groups.store'), d, { onError: (e) => toast('Corrige les erreurs.', 'error'), onFinish: () => { loading.value = false } })
+  router.post(route('groups.store'), d, { onError: (e) => toast('t("create.fix_errors")', 'error'), onFinish: () => { loading.value = false } })
 }
 </script>
 

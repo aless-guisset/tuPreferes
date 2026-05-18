@@ -14,6 +14,7 @@ class QuestionGroup extends Model {
     public function groupItems(): HasMany      { return $this->hasMany(QuestionGroupItem::class,'group_id')->orderBy('position'); }
     public function eliminationItems(): HasMany{ return $this->hasMany(EliminationItem::class,'group_id')->orderBy('position'); }
     public function eliminationSessions(): HasMany { return $this->hasMany(EliminationSession::class,'group_id'); }
+    public function reports() { return $this->morphMany(Report::class, 'reportable'); }
     public function groupProgress(): HasMany   { return $this->hasMany(GroupProgress::class,'group_id'); }
 
     public function getWinnerStatsAttribute(): array {

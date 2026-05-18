@@ -12,35 +12,35 @@
         <span class="font-display logo-text">TuPréfères</span>
       </Link>
 
-      <h1 class="font-display auth-title">Bon retour !</h1>
-      <p class="auth-subtitle">Connecte-toi pour voter et créer tes dilemmes.</p>
+      <h1 class="font-display auth-title">{{ t("auth.login_title") }} !</h1>
+      <p class="auth-subtitle">{{ t('auth.login_sub') }}</p>
 
       <form @submit.prevent="submit" class="auth-form">
         <div class="field">
-          <label class="field-label">Email</label>
+          <label class="field-label">{{ t('auth.email') }}</label>
           <input v-model="form.email" type="email" class="field-input" placeholder="toi@example.com" required autocomplete="email" />
           <p v-if="errors.email" class="field-error">{{ errors.email }}</p>
         </div>
 
         <div class="field">
-          <label class="field-label">Mot de passe</label>
+          <label class="field-label">{{ t('auth.password') }}</label>
           <input v-model="form.password" type="password" class="field-input" placeholder="••••••••" required autocomplete="current-password" />
           <p v-if="errors.password" class="field-error">{{ errors.password }}</p>
         </div>
 
         <label class="remember-label">
           <input v-model="form.remember" type="checkbox" />
-          <span>Se souvenir de moi</span>
+          <span>{{ t('auth.remember') }}</span>
         </label>
 
         <button type="submit" class="btn-primary auth-btn" :disabled="loading">
-          {{ loading ? 'Connexion...' : 'Se connecter' }}
+          {{ loading ? '{{ t('common.loading') }}' : 't('auth.login_btn') }} }}
         </button>
       </form>
 
       <p class="auth-switch">
-        Pas encore de compte ?
-        <Link :href="route('register')" class="auth-link">S'inscrire gratuitement</Link>
+        {{ t('auth.no_account') }}
+        <Link :href="route('register')" class="auth-link">{{ t('auth.register_link') }}</Link>
       </p>
     </div>
   </div>
@@ -48,10 +48,14 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
+import { useI18n } from '@/Composables/useI18n'
+import { useI18n } from '@/Composables/useI18n'
 import { Link, router } from '@inertiajs/vue3'
 import { useTheme } from '@/Composables/useTheme'
 
 const { theme } = useTheme()
+const { t } = useI18n()
+const { t } = useI18n()
 const loading = ref(false)
 const errors = ref({})
 

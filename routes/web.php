@@ -56,3 +56,47 @@ Route::middleware('auth')->group(function () {
     Route::post('/groupe/{group}/elimination/start',  [QuestionGroupController::class, 'startElimination'])->name('groups.elimination.start');
     Route::post('/groupe/{group}/elimination/choose', [QuestionGroupController::class, 'chooseElimination'])->name('groups.elimination.choose');
 });
+
+// ─── Admin ────────────────────────────────────────────────────────────────────
+use App\Http\Controllers\AdminController;
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/',           [AdminController::class, 'index'])->name('index');
+    Route::get('/users',      [AdminController::class, 'users'])->name('users');
+    Route::get('/posts',      [AdminController::class, 'posts'])->name('posts');
+    Route::get('/reports',    [AdminController::class, 'reports'])->name('reports');
+    Route::get('/analytics',  [AdminController::class, 'analytics'])->name('analytics');
+
+    // Actions
+    Route::patch('/users/{user}/role',    [AdminController::class, 'updateRole'])->name('users.role');
+    Route::delete('/users/{user}',        [AdminController::class, 'deleteUser'])->name('users.delete');
+    Route::patch('/users/{user}/ban',     [AdminController::class, 'banUser'])->name('users.ban');
+    Route::patch('/posts/{id}/hide',      [AdminController::class, 'hidePost'])->name('posts.hide');
+    Route::delete('/posts/{id}',          [AdminController::class, 'deletePost'])->name('posts.delete');
+    Route::patch('/reports/{report}/resolve', [AdminController::class, 'resolveReport'])->name('reports.resolve');
+});
+
+// ─── Signalements ─────────────────────────────────────────────────────────────
+Route::post('/question/{question}/signaler', function(\Illuminate\Http\Request $request, \App\Models\Question $question) {
+    $request->validate(['reason'=>['required','string'],'comment'=>['nullable','string','max:500']]);
+    \App\Models\Report::create([
+        'user_id'          => auth()->id(),
+        'reportable_type'  => \App\Models\Question::class,
+        'reportable_id'    => $question->id,
+        'reason'           => $request->reason,
+        'comment'          => $request->comment,
+    ]);
+    return response()->json(['message' => 'Signalement envoyé.']);
+})->name('questions.report')->middleware('auth');
+
+Route::post('/groupe/{group}/signaler', function(\Illuminate\Http\Request $request, \App\Models\QuestionGroup $group) {
+    $request->validate(['reason'=>['required','string'],'comment'=>['nullable','string','max:500']]);
+    \App\Models\Report::create([
+        'user_id'          => auth()->id(),
+        'reportable_type'  => \App\Models\QuestionGroup::class,
+        'reportable_id'    => $group->id,
+        'reason'           => $request->reason,
+        'comment'          => $request->comment,
+    ]);
+    return response()->json(['message' => 'Signalement envoyé.']);
+})->name('groups.report')->middleware('auth');

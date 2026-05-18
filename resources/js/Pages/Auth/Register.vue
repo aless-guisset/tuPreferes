@@ -9,39 +9,39 @@
         <span>🤔</span>
         <span class="font-display logo-text">TuPréfères</span>
       </Link>
-      <h1 class="font-display auth-title">Rejoins-nous !</h1>
-      <p class="auth-subtitle">Crée ton compte et lance tes premiers dilemmes.</p>
+      <h1 class="font-display auth-title">{{ t("auth.register_title") }} !</h1>
+      <p class="auth-subtitle">{{ t("auth.register_sub") }}</p>
       <form @submit.prevent="submit" class="auth-form">
         <div class="field">
-          <label class="field-label">Prénom / Nom</label>
+          <label class="field-label">{{ t("auth.name") }}</label>
           <input v-model="form.name" type="text" class="field-input" placeholder="Alice Dupont" required autocomplete="name" />
           <p v-if="errors.name" class="field-error">{{ errors.name }}</p>
         </div>
         <div class="field">
-          <label class="field-label">Nom d'utilisateur</label>
+          <label class="field-label">{{ t("auth.username") }}</label>
           <input v-model="form.username" type="text" class="field-input" placeholder="alice42" required autocomplete="username" />
           <p v-if="errors.username" class="field-error">{{ errors.username }}</p>
         </div>
         <div class="field">
-          <label class="field-label">Email</label>
+          <label class="field-label">{{ t("auth.email") }}</label>
           <input v-model="form.email" type="email" class="field-input" placeholder="alice@example.com" required autocomplete="email" />
           <p v-if="errors.email" class="field-error">{{ errors.email }}</p>
         </div>
         <div class="field">
-          <label class="field-label">Mot de passe</label>
+          <label class="field-label">{{ t("auth.password") }}</label>
           <input v-model="form.password" type="password" class="field-input" placeholder="••••••••" required autocomplete="new-password" />
           <p v-if="errors.password" class="field-error">{{ errors.password }}</p>
         </div>
         <div class="field">
-          <label class="field-label">Confirmer le mot de passe</label>
+          <label class="field-label">{{ t("auth.password_confirm") }}</label>
           <input v-model="form.password_confirmation" type="password" class="field-input" placeholder="••••••••" required autocomplete="new-password" />
         </div>
         <button type="submit" class="btn-primary auth-btn" :disabled="loading">
-          {{ loading ? 'Création...' : '🚀 Créer mon compte' }}
+          {{ loading ? t('common.loading') : t('auth.register_btn') }}
         </button>
       </form>
       <p class="auth-switch">
-        Déjà inscrit ? <Link :href="route('login')" class="auth-link">Se connecter</Link>
+        {{ t("auth.has_account") }} ? <Link :href="route('login')" class="auth-link">{{ t("auth.login_link") }}</Link>
       </p>
     </div>
   </div>
@@ -49,9 +49,13 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
+import { useI18n } from '@/Composables/useI18n'
+import { useI18n } from '@/Composables/useI18n'
 import { Link, router } from '@inertiajs/vue3'
 import { useTheme } from '@/Composables/useTheme'
 const { theme } = useTheme()
+const { t } = useI18n()
+const { t } = useI18n()
 const loading = ref(false)
 const errors  = ref({})
 const form = reactive({ name: '', username: '', email: '', password: '', password_confirmation: '' })

@@ -2,8 +2,8 @@
   <AppLayout>
     <div class="edit-layout">
       <div class="edit-header">
-        <Link :href="route('profile.show')" class="back-link">← Retour au profil</Link>
-        <h1 class="font-display edit-title">Modifier mon profil</h1>
+        <Link :href="route('profile.show')" class="back-link">{{ t("common.back") }}</Link>
+        <h1 class="font-display edit-title">{{ t("profile.edit_title") }}</h1>
       </div>
 
       <form class="edit-form card" @submit.prevent="submit" enctype="multipart/form-data">
@@ -15,21 +15,21 @@
             <button type="button" class="avatar-change-btn" @click="$refs.avatarInput.click()">📷</button>
           </div>
           <div>
-            <p class="avatar-label font-display">Photo de profil</p>
-            <p class="avatar-hint">JPG, PNG · max 2 Mo</p>
+            <p class="avatar-label font-display">{{ t("profile.avatar") }}</p>
+            <p class="avatar-hint">{{ t("profile.avatar_hint") }}</p>
           </div>
           <input ref="avatarInput" type="file" accept="image/*" class="file-hidden" @change="onAvatarChange" />
         </div>
 
         <div class="fields-grid">
           <div class="field">
-            <label class="field-label">Nom complet <span class="required">*</span></label>
+            <label class="field-label">{{ t("profile.fullname") }} <span class="required">*</span></label>
             <input v-model="form.name" type="text" class="field-input" required maxlength="255" />
             <p v-if="errors.name" class="field-error">{{ errors.name }}</p>
           </div>
 
           <div class="field">
-            <label class="field-label">Nom d'utilisateur <span class="required">*</span></label>
+            <label class="field-label">{{ t("auth.username") }} <span class="required">*</span></label>
             <div class="input-prefix-wrap">
               <span class="input-prefix">@</span>
               <input v-model="form.username" type="text" class="field-input input-with-prefix" required maxlength="30" />
@@ -40,24 +40,24 @@
 
         <div class="field">
           <label class="field-label">Bio <span class="optional">(optionnel)</span></label>
-          <textarea v-model="form.bio" class="field-input field-textarea" rows="3" maxlength="160" placeholder="Parle un peu de toi..." />
+          <textarea v-model="form.bio" class="field-input field-textarea" rows="3" maxlength="160" placeholder="{{ t("profile.bio_placeholder") }}" />
           <p class="char-count">{{ form.bio?.length || 0 }} / 160</p>
           <p v-if="errors.bio" class="field-error">{{ errors.bio }}</p>
         </div>
 
         <div class="form-actions">
-          <Link :href="route('profile.show')" class="btn-ghost">Annuler</Link>
+          <Link :href="route('profile.show')" class="btn-ghost">{{ t("create.cancel") }}</Link>
           <button type="submit" class="btn-primary" :disabled="loading">
-            {{ loading ? 'Sauvegarde...' : '💾 Sauvegarder' }}
+            {{ loading ? '{{ t("common.loading") }}' : '💾 Sauvegarder' }}
           </button>
         </div>
       </form>
 
       <!-- Danger zone -->
       <div class="danger-zone card">
-        <h3 class="font-display danger-title">Zone de danger</h3>
+        <h3 class="font-display danger-title">{{ t("profile.danger_zone") }}</h3>
         <p class="danger-text">La suppression de ton compte est irréversible. Toutes tes données seront perdues.</p>
-        <button class="btn-danger" @click="confirmDelete">Supprimer mon compte</button>
+        <button class="btn-danger" @click="confirmDelete">{{ t("profile.delete_account") }}</button>
       </div>
     </div>
   </AppLayout>
@@ -65,9 +65,11 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
+import { useI18n } from '@/Composables/useI18n'
 import { Link, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 
+const { t } = useI18n()
 const props = defineProps({ profileUser: Object })
 
 const loading = ref(false)

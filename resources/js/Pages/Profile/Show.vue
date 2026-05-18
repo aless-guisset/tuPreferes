@@ -17,7 +17,7 @@
           <div class="hero-actions">
             <Link :href="route('profile.edit')" class="btn-ghost">✏️ Modifier</Link>
             <form @submit.prevent="logout">
-              <button type="submit" class="btn-ghost">Se déconnecter</button>
+              <button type="submit" class="btn-ghost">{{ t("nav.logout") }}</button>
             </form>
           </div>
         </div>
@@ -26,17 +26,17 @@
         <div class="stats-bar">
           <div class="stat-item">
             <span class="stat-num font-display">{{ stats.questions_created }}</span>
-            <span class="stat-label">Questions créées</span>
+            <span class="stat-label">{{ t("profile.questions_created") }}</span>
           </div>
           <div class="stat-divider" />
           <div class="stat-item">
             <span class="stat-num font-display">{{ stats.questions_answered }}</span>
-            <span class="stat-label">Questions répondues</span>
+            <span class="stat-label">{{ t("profile.questions_answered") }}</span>
           </div>
           <div class="stat-divider" />
           <div class="stat-item">
             <span class="stat-num font-display">{{ stats.total_votes_received }}</span>
-            <span class="stat-label">Votes reçus</span>
+            <span class="stat-label">{{ t("profile.votes_received") }}</span>
           </div>
         </div>
       </div>
@@ -54,7 +54,7 @@
 
       <!-- ── Tab content ────────────────────────────────────────────────── -->
 
-      <!-- Mes questions -->
+      <!-- {{ t("profile.my_questions") }} -->
       <div v-if="activeTab === 'questions'" class="tab-content">
         <div v-if="myQuestions.length" class="questions-grid">
           <div v-for="q in myQuestions" :key="q.id" class="mini-card card">
@@ -80,7 +80,7 @@
         </div>
       </div>
 
-      <!-- Historique -->
+      <!-- {{ t("profile.history") }} -->
       <div v-if="activeTab === 'history'" class="tab-content" id="history">
         <div v-if="history.length" class="history-list">
           <div v-for="h in history" :key="h.id" class="history-item card">
@@ -101,7 +101,7 @@
         </div>
       </div>
 
-      <!-- Mes votes -->
+      <!-- {{ t("profile.my_votes") }} -->
       <div v-if="activeTab === 'votes'" class="tab-content">
         <div v-if="myVotes.length" class="votes-list">
           <div v-for="v in myVotes" :key="v.question_id" class="vote-item card">
@@ -110,14 +110,14 @@
               <span class="vote-time">{{ v.voted_at }}</span>
             </div>
             <p class="vote-chosen">
-              Tu as choisi : <strong>{{ v.chosen_option }}</strong>
+              {{ t("profile.chosen") }} <strong>{{ v.chosen_option }}</strong>
             </p>
-            <Link :href="route('questions.show', v.question_id)" class="mini-link">Voir les résultats →</Link>
+            <Link :href="route('questions.show', v.question_id)" class="mini-link">{{ t("profile.see_results") }}</Link>
           </div>
         </div>
         <div v-else class="empty-tab">
           <p>Tu n'as pas encore répondu à des questions.</p>
-          <Link :href="route('questions.index')" class="btn-primary">Explorer les questions</Link>
+          <Link :href="route('questions.index')" class="btn-primary">{{ t("profile.explore") }}</Link>
         </div>
       </div>
 
@@ -127,6 +127,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from '@/Composables/useI18n'
 import { Link, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 
@@ -140,9 +141,9 @@ defineProps({
 
 const activeTab = ref('questions')
 const tabs = [
-  { id: 'questions', label: 'Mes questions', icon: '🎯' },
-  { id: 'history',   label: 'Historique',    icon: '🕐' },
-  { id: 'votes',     label: 'Mes votes',     icon: '✅' },
+  { id: 'questions', label: '{{ t("profile.my_questions") }}', icon: '🎯' },
+  { id: 'history',   label: '{{ t("profile.history") }}',    icon: '🕐' },
+  { id: 'votes',     label: '{{ t("profile.my_votes") }}',     icon: '✅' },
 ]
 
 const catEmoji = (c) => ({

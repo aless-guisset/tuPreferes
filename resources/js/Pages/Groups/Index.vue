@@ -3,20 +3,20 @@
     <div class="groups-layout">
       <div class="page-header">
         <div>
-          <h1 class="font-display page-title">Groupes & Tournois</h1>
+          <h1 class="font-display page-title">{{ t("nav.groups") }}</h1>
           <p class="page-sub">Des séries de questions et des tournois éliminatoires</p>
         </div>
         <Link v-if="$page.props.auth.user" :href="route('groups.create')" class="btn-primary">+ Créer</Link>
       </div>
       <div class="type-filters">
-        <button class="type-filter" :class="{ active: filter === 'all' }" @click="filter = 'all'">Tous</button>
-        <button class="type-filter" :class="{ active: filter === 'group' }" @click="filter = 'group'">📦 Groupes</button>
-        <button class="type-filter" :class="{ active: filter === 'elimination' }" @click="filter = 'elimination'">🏆 Tournois</button>
+        <button class="type-filter" :class="{ active: filter === 'all' }" @click="filter = 'all'">{{ t("filters.all") }}</button>
+        <button class="type-filter" :class="{ active: filter === 'group' }" @click="filter = 'group'">📦 {{ t("filters.group") }}</button>
+        <button class="type-filter" :class="{ active: filter === 'elimination' }" @click="filter = 'elimination'">🏆 {{ t("filters.elimination") }}</button>
       </div>
       <div v-if="filteredGroups.length" class="groups-list">
         <div v-for="(g, i) in filteredGroups" :key="g.id" class="group-card card animate-fade-up" :style="{ animationDelay: i * 60 + 'ms' }">
           <div class="gc-header">
-            <span class="gc-badge" :class="'gc-badge-' + g.type">{{ g.type === 'elimination' ? '🏆 Tournoi éliminatoire' : '📦 Groupe de questions' }}</span>
+            <span class="gc-badge" :class="'gc-badge-' + g.type">{{ g.type === 'elimination' ? '🏆 {{ t("group.badge_elim") }}' : '📦 {{ t("group.badge_group") }}' }}</span>
             <span class="gc-time">{{ g.created_at }}</span>
           </div>
           <h2 class="font-display gc-title">{{ g.title }}</h2>
@@ -30,14 +30,14 @@
             <span class="gc-progress-label">{{ g.current_position }}/{{ g.total_questions }}</span>
           </div>
           <div class="gc-footer">
-            <span v-if="g.completed" class="gc-done">✓ Terminé</span>
-            <Link :href="route('groups.show', g.id)" class="btn-primary gc-btn">{{ g.type === 'elimination' ? '⚔️ Jouer' : '▶ Commencer' }}</Link>
+            <span v-if="g.completed" class="gc-done">✓ {{ t("group.completed") }}</span>
+            <Link :href="route('groups.show', g.id)" class="btn-primary gc-btn">{{ g.type === 'elimination' ? '⚔️ {{ t("group.play") }}' : '▶ {{ t("group.start") }}' }}</Link>
           </div>
         </div>
       </div>
       <div v-else class="empty-state">
         <div class="empty-emoji">📦</div>
-        <h2 class="font-display">Aucun groupe pour l'instant</h2>
+        <h2 class="font-display">{{ t("home.empty") }}</h2>
         <p>Sois le premier à créer un groupe ou un tournoi !</p>
         <Link v-if="$page.props.auth.user" :href="route('groups.create')" class="btn-primary">Créer</Link>
       </div>
@@ -47,9 +47,11 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useI18n } from '@/Composables/useI18n'
 import { Link, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 
+const { t } = useI18n()
 const props = defineProps({ groups: Object })
 const filter = ref('all')
 const filteredGroups = computed(() => {

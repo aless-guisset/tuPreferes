@@ -7,21 +7,21 @@
         <div class="sidebar-card">
           <h3 class="sidebar-title font-display">Type</h3>
           <nav class="category-nav">
-            <button class="cat-btn" :class="{ active: !filters.type }" @click="filterBy('type', null)">🎲 Tous</button>
-            <button class="cat-btn" :class="{ active: filters.type === 'simple' }" @click="filterBy('type', 'simple')">⚡ Simple</button>
-            <button class="cat-btn" :class="{ active: filters.type === 'group' }" @click="filterBy('type', 'group')">📦 Groupe</button>
-            <button class="cat-btn" :class="{ active: filters.type === 'elimination' }" @click="filterBy('type', 'elimination')">🏆 Éliminatoire</button>
+            <button class="cat-btn" :class="{ active: !filters.type }" @click="filterBy('type', null)">🎲 {{ t("filters.all") }}</button>
+            <button class="cat-btn" :class="{ active: filters.type === 'simple' }" @click="filterBy('type', 'simple')">⚡ {{ t("filters.simple") }}</button>
+            <button class="cat-btn" :class="{ active: filters.type === 'group' }" @click="filterBy('type', 'group')">📦 {{ t("filters.group") }}</button>
+            <button class="cat-btn" :class="{ active: filters.type === 'elimination' }" @click="filterBy('type', 'elimination')">🏆 {{ t("filters.elimination") }}</button>
           </nav>
         </div>
         <div class="sidebar-card">
-          <h3 class="sidebar-title font-display">Catégories</h3>
+          <h3 class="sidebar-title font-display">{{ t("filters.categories") }}</h3>
           <nav class="category-nav">
             <button class="cat-btn" :class="{ active: !filters.category }" @click="filterBy('category', null)">🎲 Toutes</button>
             <button v-for="cat in allCategories" :key="cat" class="cat-btn" :class="{ active: filters.category === cat }" @click="filterBy('category', cat)">{{ catEmoji(cat) }} {{ cat }}</button>
           </nav>
         </div>
         <div class="sidebar-card">
-          <h3 class="sidebar-title font-display">Trier par</h3>
+          <h3 class="sidebar-title font-display">{{ t("filters.sort") }}</h3>
           <div class="sort-btns">
             <button v-for="s in sorts" :key="s.value" class="cat-btn" :class="{ active: (filters.sort || 'recent') === s.value }" @click="filterBy('sort', s.value)">{{ s.label }}</button>
           </div>
@@ -34,7 +34,7 @@
 
         <!-- Suggestions -->
         <div v-if="suggestions.length" class="suggestions-band">
-          <div class="suggestions-header"><span class="font-display suggestions-title">✨ Pour toi</span></div>
+          <div class="suggestions-header"><span class="font-display suggestions-title">✨ {{ t("home.suggestions") }}</span></div>
           <div class="suggestions-scroll">
             <Link v-for="s in suggestions" :key="s.id" :href="route('questions.show', s.id)" class="suggestion-chip">
               {{ s.options[0]?.label }} vs {{ s.options[1]?.label }}
@@ -44,10 +44,10 @@
 
         <!-- Filtres mobile -->
         <div class="mobile-cats">
-          <button class="cat-pill" :class="{ active: !filters.type }" @click="filterBy('type', null)">Tous</button>
-          <button class="cat-pill" :class="{ active: filters.type === 'simple' }" @click="filterBy('type', 'simple')">⚡ Simple</button>
-          <button class="cat-pill" :class="{ active: filters.type === 'group' }" @click="filterBy('type', 'group')">📦 Groupe</button>
-          <button class="cat-pill" :class="{ active: filters.type === 'elimination' }" @click="filterBy('type', 'elimination')">🏆 Éliminatoire</button>
+          <button class="cat-pill" :class="{ active: !filters.type }" @click="filterBy('type', null)">{{ t("filters.all") }}</button>
+          <button class="cat-pill" :class="{ active: filters.type === 'simple' }" @click="filterBy('type', 'simple')">⚡ {{ t("filters.simple") }}</button>
+          <button class="cat-pill" :class="{ active: filters.type === 'group' }" @click="filterBy('type', 'group')">📦 {{ t("filters.group") }}</button>
+          <button class="cat-pill" :class="{ active: filters.type === 'elimination' }" @click="filterBy('type', 'elimination')">🏆 {{ t("filters.elimination") }}</button>
           <span class="cat-pill-sep">|</span>
           <button v-for="cat in allCategories" :key="cat" class="cat-pill" :class="{ active: filters.category === cat }" @click="filterBy('category', cat)">{{ catEmoji(cat) }} {{ cat }}</button>
         </div>
@@ -58,11 +58,11 @@
             <!-- Question simple -->
             <QuestionCard v-if="item.item_type === 'question'" :question="item" :delay="i * 60" />
 
-            <!-- Groupe ou éliminatoire -->
+            <!-- {{ t("filters.group") }} ou éliminatoire -->
             <div v-else class="group-card card animate-fade-up" :style="{ animationDelay: i * 60 + 'ms' }">
               <div class="gc-header">
                 <span class="gc-badge" :class="item.type === 'elimination' ? 'gc-elim' : 'gc-group'">
-                  {{ item.type === 'elimination' ? '🏆 Éliminatoire' : '📦 Groupe' }}
+                  {{ item.type === 'elimination' ? '🏆 ' + t('filters.elimination') : '📦 ' + t('filters.group') }}
                 </span>
                 <span class="gc-cat">{{ catEmoji(item.category) }} {{ item.category }}</span>
                 <span class="gc-time">{{ item.created_at }}</span>
@@ -96,7 +96,7 @@
               </div>
 
               <div class="gc-footer">
-                <span v-if="item.completed" class="gc-done">✓ Terminé</span>
+                <span v-if="item.completed" class="gc-done">✓ {{ t("group.completed") }}</span>
                 <Link :href="route('groups.show', item.id)" class="btn-primary gc-btn">
                   {{ item.type === 'elimination' ? '⚔️ Jouer' : '▶ Commencer' }}
                 </Link>
@@ -107,7 +107,7 @@
 
         <div v-else class="empty-state">
           <div class="empty-emoji">🤔</div>
-          <h2 class="font-display">Aucune question trouvée</h2>
+          <h2 class="font-display">{{ t("home.empty") }}</h2>
           <p>Sois le premier à en poser une !</p>
           <Link v-if="$page.props.auth.user" :href="route('groups.create')" class="btn-primary">Créer</Link>
         </div>
@@ -122,21 +122,21 @@
       <aside class="sidebar-right">
         <div v-if="!$page.props.auth.user" class="sidebar-card cta-card">
           <div class="cta-emoji">🎮</div>
-          <h3 class="font-display cta-title">Rejoins la communauté !</h3>
+          <h3 class="font-display cta-title">{{ t("home.join_title") }} !</h3>
           <p class="cta-text">Connecte-toi pour voter, liker et créer tes propres questions.</p>
           <Link :href="route('register')" class="btn-primary" style="width:100%;justify-content:center;">S'inscrire</Link>
           <Link :href="route('login')" class="btn-ghost" style="width:100%;justify-content:center;margin-top:.5rem;">Se connecter</Link>
         </div>
         <div v-else class="sidebar-card cta-card">
           <div class="cta-emoji">✏️</div>
-          <h3 class="font-display cta-title">Lance un dilemme !</h3>
+          <h3 class="font-display cta-title">{{ t("home.dilemma_title") }} !</h3>
           <p class="cta-text">Crée ta propre question, groupe ou tournoi éliminatoire.</p>
           <Link :href="route('groups.create')" class="btn-primary" style="width:100%;justify-content:center;">Créer</Link>
         </div>
         <div class="sidebar-card">
           <h3 class="sidebar-title font-display">Stats globales</h3>
           <div class="global-stats">
-            <div class="gstat"><span class="gstat-num font-display">{{ questions.total }}</span><span class="gstat-label">Contenus</span></div>
+            <div class="gstat"><span class="gstat-num font-display">{{ questions.total }}</span><span class="gstat-label">{{ t("home.stats_contents") }}</span></div>
           </div>
         </div>
       </aside>
@@ -147,18 +147,20 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from '@/Composables/useI18n'
 import { Link, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import QuestionCard from '@/Components/QuestionCard.vue'
 import SearchBar from '@/Components/SearchBar.vue'
 
+const { t } = useI18n()
 const props = defineProps({ questions: Object, suggestions: Array, filters: Object, categories: Array })
 
 const allCategories = ['amour','aventure','nourriture','technologie','voyage','sport','musique','cinéma','divers']
 const sorts = [
-  { value: 'recent',  label: '🕐 Récentes' },
-  { value: 'popular', label: '❤️ Populaires' },
-  { value: 'votes',   label: '🔥 Plus votées' },
+  { value: 'recent',  label: '🕐 {{ t("filters.sort_recent") }}' },
+  { value: 'popular', label: '❤️ {{ t("filters.sort_popular") }}' },
+  { value: 'votes',   label: '🔥 {{ t("filters.sort_votes") }}' },
 ]
 
 const catEmoji = (c) => ({ amour:'❤️', aventure:'🗺️', nourriture:'🍕', technologie:'💻', voyage:'✈️', sport:'⚽', musique:'🎵', 'cinéma':'🎬', divers:'🎲' })[c] || '🎲'

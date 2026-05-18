@@ -13,7 +13,7 @@
       <!-- Non connecté -->
       <div v-if="!$page.props.auth.user" class="auth-prompt card">
         <div class="auth-icon">🔒</div>
-        <h2 class="font-display">Connecte-toi pour jouer !</h2>
+        <h2 class="font-display">{{ t("elimination.start_title") }} !</h2>
         <p>Il faut un compte pour participer au tournoi.</p>
         <div class="auth-btns">
           <Link :href="route('login')" class="btn-primary">Se connecter</Link>
@@ -24,7 +24,7 @@
       <!-- Pas encore commencé -->
       <div v-else-if="!localSession" class="start-screen card">
         <div class="start-icon">⚔️</div>
-        <h2 class="font-display">Prêt pour le tournoi ?</h2>
+        <h2 class="font-display">{{ t("elimination.start_title") }} ?</h2>
         <p>{{ items.length }} items vont s'affronter en duels. Le dernier restant sera ton champion !</p>
         <div class="items-preview">
           <span v-for="item in items.slice(0, 8)" :key="item.id" class="item-chip">
@@ -43,7 +43,7 @@
         <div class="duel-progress card">
           <div class="duel-progress-info">
             <span class="font-display duel-remaining">{{ localSession.remaining_count }} restants</span>
-            <span class="duel-hint">Choisis ton préféré !</span>
+            <span class="duel-hint">{{ t("elimination.hint") }} !</span>
           </div>
           <div class="duel-progress-bar">
             <div class="duel-progress-fill" :style="{ width: eliminationPct + '%' }" />
@@ -69,16 +69,16 @@
       <div v-else class="result-screen">
         <div class="winner-card card">
           <div class="winner-crown">👑</div>
-          <h2 class="font-display winner-title">Ton champion !</h2>
+          <h2 class="font-display winner-title">{{ t("elimination.champion") }} !</h2>
           <div class="winner-item">
             <img v-if="localSession.winner?.image" :src="localSession.winner.image" class="winner-img" />
             <span class="font-display winner-label">{{ localSession.winner?.label }}</span>
           </div>
-          <button class="btn-ghost restart-btn" @click="restartTournament">🔄 Rejouer</button>
+          <button class="btn-ghost restart-btn" @click="restartTournament">🔄 {{ t("elimination.replay") }}</button>
         </div>
 
         <div v-if="localStats?.length" class="global-stats card">
-          <h3 class="font-display stats-title">Résultats de la communauté</h3>
+          <h3 class="font-display stats-title">{{ t("elimination.community") }}</h3>
           <p class="stats-subtitle">{{ totalSessions }} joueur{{ totalSessions > 1 ? 's' : '' }} ont terminé ce tournoi</p>
           <div class="stats-list">
             <div v-for="(s, i) in localStats" :key="i" class="stat-row">
@@ -100,6 +100,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useI18n } from '@/Composables/useI18n'
 import { Link } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import axios from 'axios'
@@ -107,6 +108,7 @@ import { useToast } from '@/Composables/useToast'
 
 const props = defineProps({ group: Object, items: Array, session: Object, duel: Object, stats: Array })
 const { add: toast } = useToast()
+const { t } = useI18n()
 
 const starting     = ref(false)
 const choosing     = ref(false)
@@ -130,7 +132,7 @@ const startTournament = async () => {
     currentDuel.value  = data.duel
     duelKey.value++
   } catch (e) {
-    toast('Erreur au démarrage.', 'error')
+    toast('t("common.error")', 'error')
   } finally {
     starting.value = false
   }
@@ -144,7 +146,7 @@ const choose = async (winnerId) => {
     localSession.value = { remaining_count: data.remaining_count, completed: data.completed, winner: data.winner ?? null }
     if (data.completed) {
       localStats.value = data.stats
-      toast('Tournoi terminé ! 🏆', 'success')
+      toast('t("elimination.champion")', 'success')
     } else {
       currentDuel.value = data.duel
       duelKey.value++

@@ -15,7 +15,7 @@
     <h2 v-if="question.title" class="card-title font-display">{{ question.title }}</h2>
 
     <div class="vs-label">
-      <div class="vs-line" /><span class="vs-text font-display">TU PRÉFÈRES</span><div class="vs-line" />
+      <div class="vs-line" /><span class="vs-text font-display">{{ t('question.tu_preferes') }}</span><div class="vs-line" />
     </div>
 
     <div class="options-wrap">
@@ -56,7 +56,7 @@
 
     <Transition name="fade">
       <div v-if="localVote !== null" class="total-votes-row">
-        {{ localTotalVotes }} réponse{{ localTotalVotes !== 1 ? 's' : '' }} au total
+        {{ localTotalVotes }} {{ tp('question.votes_total', localTotalVotes) }} au total
       </div>
     </Transition>
 
@@ -69,17 +69,45 @@
           <ShareIcon /><span>{{ localShares }}</span>
         </button>
       </template>
-      <Link :href="route('questions.show', question.id)" class="action-btn action-link">Voir →</Link>
+      <Link :href="route('questions.show', question.id)" class="action-btn action-link">{{ t('question.see') }}</Link>
       <button
         v-if="$page.props.auth.user && question.author && $page.props.auth.user.id === question.author.id"
         class="action-btn action-danger" @click="deleteQuestion"
       ><TrashIcon /></button>
     </div>
   </article>
+
+  <!-- Modal signalement -->
+  <Teleport to="body">
+    <div v-if="reportModal" class="modal-overlay" @click.self="reportModal = false">
+      <div class="modal-box card">
+        <h3 class="font-display modal-title">🚩 Signaler ce post</h3>
+        <div class="field">
+          <label class="field-label">Raison</label>
+          <select v-model="reportReason" class="field-input">
+            <option value="inapproprie">Inapproprié</option>
+            <option value="spam">Spam</option>
+            <option value="harcelement">Harcèlement</option>
+            <option value="fausse_information">Fausse information</option>
+            <option value="autre">Autre</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">Commentaire (optionnel)</label>
+          <textarea v-model="reportComment" class="field-input" rows="3" placeholder="Décris le problème..." />
+        </div>
+        <div class="modal-actions">
+          <button class="btn-ghost" @click="reportModal = false">Annuler</button>
+          <button class="btn-primary" @click="submitReport">Envoyer le signalement</button>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useI18n } from '@/Composables/useI18n'
 import { Link, router, usePage } from '@inertiajs/vue3'
 import axios from 'axios'
 import { useToast } from '@/Composables/useToast'
@@ -93,6 +121,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['updated', 'vote'])
 const { add: toast } = useToast()
+const { t, tp } = useI18n()
 
 const localVote       = ref(props.question.user_vote)
 const localOptions    = ref([...props.question.options])
@@ -103,6 +132,21 @@ const localShares     = ref(props.question.total_shares)
 const voteLoading     = ref(false)
 const playingAudio    = ref(null)
 let audioEl = null
+const reportModal   = ref(false)
+const reportReason  = ref('inapproprie')
+const reportComment = ref('')
+
+const submitReport = async () => {
+  try {
+    await axios.post(route('questions.report', props.question.id), {
+      reason:  reportReason.value,
+      comment: reportComment.value,
+    })
+    reportModal.value   = false
+    reportComment.value = ''
+    toast('Signalement envoyé. Merci')
+  } catch { toast('Erreur.', 'error') }
+}
 
 const categoryEmojis = { amour:'❤️', aventure:'🗺️', nourriture:'🍕', technologie:'💻', voyage:'✈️', sport:'⚽', musique:'🎵', 'cinéma':'🎬', divers:'🎲' }
 const categoryEmoji = computed(() => categoryEmojis[props.question.category] || '🎲')
@@ -125,9 +169,9 @@ const handleVote = async (optionId) => {
     localOptions.value    = data.question.options
     localTotalVotes.value = data.question.total_votes
     emit('updated', data.question)
-    toast('Vote enregistré ! 🎉')
+    toast(t('question.vote_success'))
   } catch (e) {
-    toast(e.response?.data?.message || 'Erreur lors du vote.', 'error')
+    toast(e.response?.data?.message || t('common.error'), 'error')
   } finally {
     voteLoading.value = false
   }
@@ -145,14 +189,14 @@ const shareQuestion = async () => {
   const url = route('questions.show', props.question.id)
   try {
     if (navigator.share) await navigator.share({ title: 'Tu préfères ?', url })
-    else { await navigator.clipboard.writeText(url); toast('Lien copié ! 📋') }
+    else { await navigator.clipboard.writeText(url); toast(t('question.link_copied')) }
     const { data } = await axios.post(route('questions.share', props.question.id), { platform: 'link' })
     localShares.value = data.total_shares
   } catch {}
 }
 
 const deleteQuestion = () => {
-  if (!confirm('Supprimer cette question ?')) return
+  if (!confirm(t('question.delete_confirm'))) return
   router.delete(route('questions.destroy', props.question.id))
 }
 
@@ -214,4 +258,16 @@ const toggleAudio = (optionId, url) => {
 .fade-enter-active { transition: opacity .3s ease; }
 .fade-enter-from { opacity: 0; }
 @media (max-width: 480px) { .options-wrap { flex-direction: column; } .question-card { padding: 1rem; } }
+</style>
+
+<style>
+.action-report:hover { color: #ef4444; border-color: rgba(239,68,68,.3); }
+.modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem; }
+.modal-box { padding:2rem;max-width:440px;width:100%;display:flex;flex-direction:column;gap:1.25rem; }
+.modal-title { font-size:1.25rem;font-weight:800;margin:0; }
+.modal-actions { display:flex;justify-content:flex-end;gap:.75rem; }
+.field { display:flex;flex-direction:column;gap:.35rem; }
+.field-label { font-size:.8rem;font-weight:600;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.04em; }
+.field-input { width:100%;box-sizing:border-box;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:.7rem .9rem;color:var(--color-text);font-family:var(--font-body);font-size:.9rem;outline:none;resize:vertical; }
+.field-input:focus { border-color:var(--color-accent); }
 </style>
