@@ -54,7 +54,7 @@
 
       <!-- ── Tab content ────────────────────────────────────────────────── -->
 
-      <!-- {{ t("profile.my_questions") }} -->
+      <!-- Mes questions -->
       <div v-if="activeTab === 'questions'" class="tab-content">
         <div v-if="myQuestions.length" class="questions-grid">
           <div v-for="q in myQuestions" :key="q.id" class="mini-card card">
@@ -80,7 +80,7 @@
         </div>
       </div>
 
-      <!-- {{ t("profile.history") }} -->
+      <!-- Historique -->
       <div v-if="activeTab === 'history'" class="tab-content" id="history">
         <div v-if="history.length" class="history-list">
           <div v-for="h in history" :key="h.id" class="history-item card">
@@ -101,7 +101,7 @@
         </div>
       </div>
 
-      <!-- {{ t("profile.my_votes") }} -->
+      <!-- Mes votes -->
       <div v-if="activeTab === 'votes'" class="tab-content">
         <div v-if="myVotes.length" class="votes-list">
           <div v-for="v in myVotes" :key="v.question_id" class="vote-item card">
@@ -128,6 +128,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useI18n } from '@/Composables/useI18n'
+const { t } = useI18n()
 import { Link, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 
@@ -141,9 +142,9 @@ defineProps({
 
 const activeTab = ref('questions')
 const tabs = [
-  { id: 'questions', label: '{{ t("profile.my_questions") }}', icon: '🎯' },
-  { id: 'history',   label: '{{ t("profile.history") }}',    icon: '🕐' },
-  { id: 'votes',     label: '{{ t("profile.my_votes") }}',     icon: '✅' },
+  { id: 'questions', label: t('profile.my_questions'), icon: '🎯' },
+  { id: 'history',   label: t('profile.history'), icon: '🕐' },
+  { id: 'votes',     label: t('profile.my_votes'), icon: '✅' },
 ]
 
 const catEmoji = (c) => ({

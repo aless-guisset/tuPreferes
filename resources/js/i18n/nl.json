@@ -60,7 +60,8 @@
     "play": "⚔️ Spelen",
     "completed": "✓ Voltooid",
     "finished": "Groep voltooid!",
-    "finished_sub": "Je hebt alle vragen beantwoord."
+    "finished_sub": "Je hebt alle vragen beantwoord.",
+    "questions_count_simple": "vragen"
   },
   "elimination": {
     "title": "Eliminatie",
@@ -123,7 +124,10 @@
     "no_account": "Nog geen account?",
     "has_account": "Al geregistreerd?",
     "register_link": "Gratis registreren",
-    "login_link": "Inloggen"
+    "login_link": "Inloggen",
+    "or_continue": "of doorgaan met",
+    "google": "Doorgaan met Google",
+    "apple": "Doorgaan met Apple"
   },
   "profile": {
     "edit": "✏️ Bewerken",

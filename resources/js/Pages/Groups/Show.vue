@@ -3,7 +3,7 @@
     <div class="group-layout">
       <div class="group-hero card">
         <div class="group-meta">
-          <span class="group-badge">📦 {{ t("group.badge_group") }} · {{ group.total_{{ t("group.questions_count", group.total_questions) }} }} {{ t("group.questions_count", group.total_questions) }}</span>
+          <span class="group-badge">📦 {{ t("group.badge_group") }} · {{ group.total_questions }} {{ t("group.questions_count_simple") }}</span>
           <span class="group-time">{{ group.created_at }}</span>
         </div>
         <h1 class="font-display group-title">{{ group.title }}</h1>
@@ -12,12 +12,12 @@
           <div class="progress-bar-wrap">
             <div class="progress-bar-fill" :style="{ width: progressPct + '%' }" />
           </div>
-          <span class="progress-label">{{ answeredCount }} / {{ group.total_{{ t("group.questions_count", group.total_questions) }} }}</span>
+          <span class="progress-label">{{ answeredCount }} / {{ group.total_questions }}</span>
         </div>
       </div>
-      <div class="{{ t("group.questions_count", group.total_questions) }}-chain">
+      <div class="questions-chain">
         <div
-          v-for="(q, idx) in {{ t("group.questions_count", group.total_questions) }}"
+          v-for="(q, idx) in questions"
           :key="q.id"
           class="chain-item"
           :class="{ 'chain-locked': idx > currentIndex }"
@@ -26,17 +26,17 @@
             <div class="chain-num font-display" :class="{ done: q.user_vote !== null }">
               {{ q.user_vote !== null ? '✓' : idx + 1 }}
             </div>
-            <div v-if="idx < group.{{ t("group.questions_count", group.total_questions) }}.length - 1" class="chain-line" :class="{ done: q.user_vote !== null }" />
+            <div v-if="idx < group.questions.length - 1" class="chain-line" :class="{ done: q.user_vote !== null }" />
           </div>
           <div class="chain-content">
-            <QuestionCard :question="q" :delay="0" @vote="onVote(idx, q.id, $event)" @updated="{{ t("group.questions_count", group.total_questions) }}[idx] = $event" />
+            <QuestionCard :question="q" :delay="0" @vote="onVote(idx, q.id, $event)" @updated="questions[idx] = $event" />
           </div>
         </div>
       </div>
       <div v-if="allDone" class="group-completed card">
         <div class="completed-icon">🎉</div>
-        <h2 class="font-display">{{ t("group.finished") }} !</h2>
-        <p>Tu as répondu à toutes les {{ t("group.questions_count", group.total_questions) }}.</p>
+        <h2 class="font-display">{{ t("group.finished") }}</h2>
+        <p>Tu as répondu à toutes les questions.</p>
       </div>
     </div>
   </AppLayout>
@@ -55,12 +55,12 @@ const props = defineProps({ group: Object })
 const { add: toast } = useToast()
 const { t } = useI18n()
 
-const {{ t("group.questions_count", group.total_questions) }}    = ref(props.group.{{ t("group.questions_count", group.total_questions) }})
+const questions    = ref(props.group.questions)
 const currentIndex = ref(props.group.current_position ?? 0)
 
-const answeredCount = computed(() => {{ t("group.questions_count", group.total_questions) }}.value.filter(q => q.user_vote !== null).length)
-const progressPct   = computed(() => Math.round(answeredCount.value / {{ t("group.questions_count", group.total_questions) }}.value.length * 100))
-const allDone       = computed(() => answeredCount.value === {{ t("group.questions_count", group.total_questions) }}.value.length)
+const answeredCount = computed(() => questions.value.filter(q => q.user_vote !== null).length)
+const progressPct   = computed(() => Math.round(answeredCount.value / questions.value.length * 100))
+const allDone       = computed(() => answeredCount.value === questions.value.length)
 
 const onVote = async (idx, questionId, optionId) => {
   if (!usePage().props.auth.user) return
@@ -69,7 +69,7 @@ const onVote = async (idx, questionId, optionId) => {
       route('groups.vote', { group: props.group.id, question: questionId }),
       { option_id: optionId }
     )
-    {{ t("group.questions_count", group.total_questions) }}.value[idx] = data.question
+    questions.value[idx] = data.question
     if (data.next_question_id) {
       currentIndex.value = idx + 1
       setTimeout(() => {
@@ -77,7 +77,7 @@ const onVote = async (idx, questionId, optionId) => {
         el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }, 500)
     }
-    if (data.completed) toast('{{ t("group.finished") }} ! 🎉', 'success')
+    if (data.completed) toast(t('group.finished') + ' 🎉', 'success')
   } catch (e) {
     toast(e.response?.data?.message || 'Erreur.', 'error')
   }
@@ -95,7 +95,7 @@ const onVote = async (idx, questionId, optionId) => {
 .progress-bar-wrap { flex: 1; height: 8px; background: var(--color-border); border-radius: 4px; overflow: hidden; }
 .progress-bar-fill { height: 100%; background: var(--color-accent); border-radius: 4px; transition: width .5s ease; }
 .progress-label { font-size: .8rem; color: var(--color-text-muted); font-weight: 600; white-space: nowrap; }
-.{{ t("group.questions_count", group.total_questions) }}-chain { display: flex; flex-direction: column; }
+.questions-chain { display: flex; flex-direction: column; }
 .chain-item { display: flex; gap: 1rem; transition: opacity .3s; }
 .chain-locked { opacity: .4; pointer-events: none; }
 .chain-connector { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }

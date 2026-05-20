@@ -60,7 +60,8 @@
     "play": "⚔️ Spielen",
     "completed": "✓ Abgeschlossen",
     "finished": "Gruppe abgeschlossen!",
-    "finished_sub": "Du hast alle Fragen beantwortet."
+    "finished_sub": "Du hast alle Fragen beantwortet.",
+    "questions_count_simple": "Fragen"
   },
   "elimination": {
     "title": "Eliminierung",
@@ -123,7 +124,10 @@
     "no_account": "Noch kein Konto?",
     "has_account": "Bereits registriert?",
     "register_link": "Kostenlos registrieren",
-    "login_link": "Anmelden"
+    "login_link": "Anmelden",
+    "or_continue": "oder weiter mit",
+    "google": "Mit Google fortfahren",
+    "apple": "Mit Apple fortfahren"
   },
   "profile": {
     "edit": "✏️ Bearbeiten",
