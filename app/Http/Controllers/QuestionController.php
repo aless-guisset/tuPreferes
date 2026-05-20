@@ -191,9 +191,21 @@ class QuestionController extends Controller
     {
         $optionId = $request->validated('option_id');
         abort_unless($question->options->pluck('id')->contains($optionId), 422);
-        if (Vote::where('user_id',Auth::id())->where('question_id',$question->id)->exists())
-            return response()->json(['message'=>'Déjà répondu.'], 422);
-        Vote::create(['user_id'=>Auth::id(),'question_id'=>$question->id,'question_option_id'=>$optionId]);
+
+        $existingVote = Vote::where('user_id',Auth::id())->where('question_id',$question->id)->first();
+
+        if ($existingVote) {
+            // Annuler l'ancien vote du compteur
+            $existingVote->update(['question_option_id' => $optionId]);
+        } else {
+            // Premier vote
+            Vote::create(['user_id'=>Auth::id(),'question_id'=>$question->id,'question_option_id'=>$optionId]);
+        }
+
+        // Enregistrer dans l'historique
+        \App\Models\VoteHistory::where('user_id',Auth::id())->where('question_id',$question->id)->update(['is_current'=>false]);
+        \App\Models\VoteHistory::create(['user_id'=>Auth::id(),'question_id'=>$question->id,'question_option_id'=>$optionId,'is_current'=>true]);
+
         $question->load('options');
         $total = $question->votes()->count();
         $opts  = $question->options->map(function($o) use($total) {

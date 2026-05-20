@@ -25,6 +25,7 @@ class User extends Authenticatable
     public function votes(): HasMany       { return $this->hasMany(Vote::class); }
     public function likes(): HasMany       { return $this->hasMany(Like::class); }
     public function shares(): HasMany      { return $this->hasMany(Share::class); }
+    public function voteHistory(): HasMany { return $this->hasMany(VoteHistory::class)->orderByDesc('created_at'); }
     public function history(): HasMany     { return $this->hasMany(QuestionHistory::class)->orderByDesc('viewed_at'); }
 
     public function isAdmin(): bool
