@@ -40,7 +40,7 @@
 
         <div class="field">
           <label class="field-label">Bio <span class="optional">(optionnel)</span></label>
-          <textarea v-model="form.bio" class="field-input field-textarea" rows="3" maxlength="160" placeholder="{{ t("profile.bio_placeholder") }}" />
+          <textarea v-model="form.bio" class="field-input field-textarea" rows="3" maxlength="160" :placeholder="t('profile.bio_placeholder')" />
           <p class="char-count">{{ form.bio?.length || 0 }} / 160</p>
           <p v-if="errors.bio" class="field-error">{{ errors.bio }}</p>
         </div>
@@ -48,7 +48,7 @@
         <div class="form-actions">
           <Link :href="route('profile.show')" class="btn-ghost">{{ t("create.cancel") }}</Link>
           <button type="submit" class="btn-primary" :disabled="loading">
-            {{ loading ? '{{ t("common.loading") }}' : '💾 Sauvegarder' }}
+            {{ loading ? t('common.loading') : '💾 Sauvegarder' }}
           </button>
         </div>
       </form>

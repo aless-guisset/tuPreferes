@@ -68,11 +68,9 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { useI18n } from '@/Composables/useI18n'
-import { useI18n } from '@/Composables/useI18n'
 import { Link, router } from '@inertiajs/vue3'
 import { useTheme } from '@/Composables/useTheme'
 const { theme } = useTheme()
-const { t } = useI18n()
 const { t } = useI18n()
 const loading = ref(false)
 const errors  = ref({})

@@ -16,7 +16,7 @@
       <div v-if="filteredGroups.length" class="groups-list">
         <div v-for="(g, i) in filteredGroups" :key="g.id" class="group-card card animate-fade-up" :style="{ animationDelay: i * 60 + 'ms' }">
           <div class="gc-header">
-            <span class="gc-badge" :class="'gc-badge-' + g.type">{{ g.type === 'elimination' ? '🏆 {{ t("group.badge_elim") }}' : '📦 {{ t("group.badge_group") }}' }}</span>
+            <span class="gc-badge" :class="'gc-badge-' + g.type">{{ g.type === 'elimination' ? '🏆 ' + t('group.badge_elim') : '📦 ' + t('group.badge_group') }}</span>
             <span class="gc-time">{{ g.created_at }}</span>
           </div>
           <h2 class="font-display gc-title">{{ g.title }}</h2>
@@ -31,7 +31,7 @@
           </div>
           <div class="gc-footer">
             <span v-if="g.completed" class="gc-done">✓ {{ t("group.completed") }}</span>
-            <Link :href="route('groups.show', g.id)" class="btn-primary gc-btn">{{ g.type === 'elimination' ? '⚔️ {{ t("group.play") }}' : '▶ {{ t("group.start") }}' }}</Link>
+            <Link :href="route('groups.show', g.id)" class="btn-primary gc-btn">{{ g.type === 'elimination' ? '⚔️ ' + t('group.play') : '▶ ' + t('group.start') }}</Link>
           </div>
         </div>
       </div>
