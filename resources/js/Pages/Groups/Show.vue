@@ -15,6 +15,7 @@
           <span class="progress-label">{{ answeredCount }} / {{ group.total_questions }}</span>
         </div>
       </div>
+
       <div class="questions-chain">
         <div
           v-for="(q, idx) in questions"
@@ -26,17 +27,23 @@
             <div class="chain-num font-display" :class="{ done: q.user_vote !== null }">
               {{ q.user_vote !== null ? '✓' : idx + 1 }}
             </div>
-            <div v-if="idx < group.questions.length - 1" class="chain-line" :class="{ done: q.user_vote !== null }" />
+            <div v-if="idx < questions.length - 1" class="chain-line" :class="{ done: q.user_vote !== null }" />
           </div>
           <div class="chain-content">
-            <QuestionCard :question="q" :delay="0" @vote="onVote(idx, q.id, $event)" @updated="questions[idx] = $event" />
+            <QuestionCard
+              :question="q"
+              :delay="0"
+              @vote="(optionId) => onVote(idx, q.id, optionId)"
+              @updated="questions[idx] = $event"
+            />
           </div>
         </div>
       </div>
+
       <div v-if="allDone" class="group-completed card">
         <div class="completed-icon">🎉</div>
         <h2 class="font-display">{{ t("group.finished") }}</h2>
-        <p>Tu as répondu à toutes les questions.</p>
+        <p>{{ t("group.finished_sub") }}</p>
       </div>
     </div>
   </AppLayout>
@@ -55,7 +62,7 @@ const props = defineProps({ group: Object })
 const { add: toast } = useToast()
 const { t } = useI18n()
 
-const questions    = ref(props.group.questions)
+const questions    = ref(props.group.questions.map(q => ({ ...q })))
 const currentIndex = ref(props.group.current_position ?? 0)
 
 const answeredCount = computed(() => questions.value.filter(q => q.user_vote !== null).length)
@@ -69,14 +76,23 @@ const onVote = async (idx, questionId, optionId) => {
       route('groups.vote', { group: props.group.id, question: questionId }),
       { option_id: optionId }
     )
-    questions.value[idx] = data.question
-    if (data.next_question_id) {
+
+    // Mettre à jour la question votée avec les nouvelles stats
+    questions.value[idx] = {
+      ...questions.value[idx],
+      ...data.question,
+      user_vote: optionId,
+    }
+
+    // Débloquer la question suivante
+    if (idx + 1 < questions.value.length) {
       currentIndex.value = idx + 1
       setTimeout(() => {
-        const el = document.querySelectorAll('.chain-item')[idx + 1]
-        el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        const els = document.querySelectorAll('.chain-item')
+        els[idx + 1]?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }, 500)
     }
+
     if (data.completed) toast(t('group.finished') + ' 🎉', 'success')
   } catch (e) {
     toast(e.response?.data?.message || 'Erreur.', 'error')
