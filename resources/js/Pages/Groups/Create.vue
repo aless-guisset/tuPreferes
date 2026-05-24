@@ -312,5 +312,26 @@ const submitElim = () => {
 .elim-row { display: flex; align-items: center; gap: .5rem; }
 .elim-num { width: 24px; text-align: center; font-size: .75rem; color: var(--color-text-faint); font-weight: 600; flex-shrink: 0; }
 .elim-row .field-input { flex: 1; padding: .5rem .75rem; }
-@media (max-width: 600px) { .type-selector { grid-template-columns: 1fr; } .options-grid, .options-grid-sm { grid-template-columns: 1fr; } .form { padding: 1.25rem; } }
+@media (max-width: 600px) {
+  .type-selector { grid-template-columns: 1fr; }
+  .options-grid { grid-template-columns: 1fr; }
+  .options-grid-sm { grid-template-columns: 1fr; }
+  .form { padding: 1rem; gap: 1rem; }
+  .create-title { font-size: 1.4rem; }
+  .type-card { flex-direction: row; justify-content: flex-start; padding: .9rem 1rem; gap: .75rem; }
+  .type-icon { font-size: 1.5rem; }
+  .form-actions { flex-direction: column; }
+  .form-actions .btn-ghost,
+  .form-actions .btn-primary { width: 100%; justify-content: center; }
+  .gq-item { flex-wrap: wrap; }
+  .gq-num { display: none; }
+  .elim-row { flex-wrap: wrap; }
+  .elim-row .field-input { min-width: 0; width: 100%; }
+  .opt-sm { flex-wrap: wrap; }
+  .opt-sm .field-input { width: 100%; }
+  .order-btns { flex-direction: column; }
+  .order-btn { width: 100%; text-align: center; }
+  .cat-grid { gap: .3rem; }
+  .cat-btn { font-size: .72rem; padding: .3rem .6rem; }
+}
 </style>
