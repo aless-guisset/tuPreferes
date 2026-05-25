@@ -154,7 +154,13 @@
     "danger_zone": "Gefahrenzone",
     "danger_text": "Das Löschen deines Kontos ist unwiderruflich.",
     "delete_account": "Konto löschen",
-    "delete_confirm": "Bist du sicher, dass du dein Konto dauerhaft löschen möchtest?"
+    "delete_confirm": "Bist du sicher, dass du dein Konto dauerhaft löschen möchtest?",
+    "followers": "Follower",
+    "following": "Folge ich",
+    "follow": "+ Folgen",
+    "unfollow": "✓ Gefolgt",
+    "no_followers": "Noch keine Follower.",
+    "no_following": "Folgt noch niemandem."
   },
   "categories": {
     "amour": "Liebe",

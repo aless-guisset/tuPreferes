@@ -6,7 +6,7 @@
         <span class="meta-dot">·</span>
         <span class="meta-time">{{ question.created_at }}</span>
       </div>
-      <div class="card-author" v-if="question.author">
+      <Link :href="question.author ? route('profile.public', question.author.id) : '#'" class="card-author" v-if="question.author" style="text-decoration:none">
         <img :src="question.author.avatar_url" :alt="question.author.name" class="author-avatar" />
         <span class="author-name">{{ question.author.name }}</span>
       </div>

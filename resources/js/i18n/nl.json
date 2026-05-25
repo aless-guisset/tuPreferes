@@ -154,7 +154,13 @@
     "danger_zone": "Gevarenzone",
     "danger_text": "Het verwijderen van je account is onomkeerbaar.",
     "delete_account": "Account verwijderen",
-    "delete_confirm": "Weet je zeker dat je je account permanent wilt verwijderen?"
+    "delete_confirm": "Weet je zeker dat je je account permanent wilt verwijderen?",
+    "followers": "Volgers",
+    "following": "Volgend",
+    "follow": "+ Volgen",
+    "unfollow": "✓ Volgend",
+    "no_followers": "Nog geen volgers.",
+    "no_following": "Volgt nog niemand."
   },
   "categories": {
     "amour": "Liefde",

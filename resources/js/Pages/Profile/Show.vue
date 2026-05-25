@@ -38,6 +38,16 @@
             <span class="stat-num font-display">{{ stats.total_votes_received }}</span>
             <span class="stat-label">{{ t("profile.votes_received") }}</span>
           </div>
+          <div class="stat-divider" />
+          <Link :href="route('profile.followers', profileUser.id)" class="stat-item" style="text-decoration:none">
+            <span class="stat-num font-display">{{ $page.props.auth.user?.followers_count ?? 0 }}</span>
+            <span class="stat-label">Abonnés</span>
+          </Link>
+          <div class="stat-divider" />
+          <Link :href="route('profile.following', profileUser.id)" class="stat-item" style="text-decoration:none">
+            <span class="stat-num font-display">{{ $page.props.auth.user?.following_count ?? 0 }}</span>
+            <span class="stat-label">Abonnements</span>
+          </Link>
         </div>
       </div>
 

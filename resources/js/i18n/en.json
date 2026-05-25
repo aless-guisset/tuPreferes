@@ -154,7 +154,13 @@
     "danger_zone": "Danger zone",
     "danger_text": "Deleting your account is irreversible.",
     "delete_account": "Delete my account",
-    "delete_confirm": "Are you sure you want to permanently delete your account?"
+    "delete_confirm": "Are you sure you want to permanently delete your account?",
+    "followers": "Followers",
+    "following": "Following",
+    "follow": "+ Follow",
+    "unfollow": "✓ Following",
+    "no_followers": "No followers yet.",
+    "no_following": "Not following anyone yet."
   },
   "categories": {
     "amour": "Love",

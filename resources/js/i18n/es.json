@@ -154,7 +154,13 @@
     "danger_zone": "Zona de peligro",
     "danger_text": "Eliminar tu cuenta es irreversible.",
     "delete_account": "Eliminar mi cuenta",
-    "delete_confirm": "¿Estás seguro de que quieres eliminar tu cuenta permanentemente?"
+    "delete_confirm": "¿Estás seguro de que quieres eliminar tu cuenta permanentemente?",
+    "followers": "Seguidores",
+    "following": "Siguiendo",
+    "follow": "+ Seguir",
+    "unfollow": "✓ Siguiendo",
+    "no_followers": "Sin seguidores por ahora.",
+    "no_following": "Sin seguidos por ahora."
   },
   "categories": {
     "amour": "Amor",

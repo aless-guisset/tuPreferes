@@ -108,3 +108,11 @@ Route::middleware('guest')->group(function () {
     Route::get('/auth/{provider}/redirect',  [SocialAuthController::class, 'redirect'])->name('social.redirect');
     Route::get('/auth/{provider}/callback',  [SocialAuthController::class, 'callback'])->name('social.callback');
 });
+
+// ─── Follows ──────────────────────────────────────────────────────────────────
+use App\Http\Controllers\FollowController;
+
+Route::get('/user/{user}',            [FollowController::class, 'profile'])->name('profile.public');
+Route::get('/user/{user}/followers',  [FollowController::class, 'followers'])->name('profile.followers');
+Route::get('/user/{user}/following',  [FollowController::class, 'following'])->name('profile.following');
+Route::post('/user/{user}/follow',    [FollowController::class, 'toggle'])->name('profile.follow')->middleware('auth');

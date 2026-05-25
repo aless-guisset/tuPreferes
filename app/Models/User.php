@@ -28,6 +28,32 @@ class User extends Authenticatable
     public function voteHistory(): HasMany { return $this->hasMany(VoteHistory::class)->orderByDesc('created_at'); }
     public function history(): HasMany     { return $this->hasMany(QuestionHistory::class)->orderByDesc('viewed_at'); }
 
+    
+    public function following(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Follow::class, 'follower_id');
+    }
+
+    public function followers(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Follow::class, 'following_id');
+    }
+
+    public function isFollowing(int $userId): bool
+    {
+        return $this->following()->where('following_id', $userId)->exists();
+    }
+
+    public function getFollowersCountAttribute(): int
+    {
+        return $this->followers()->count();
+    }
+
+    public function getFollowingCountAttribute(): int
+    {
+        return $this->following()->count();
+    }
+
     public function isAdmin(): bool
     {
         return $this->role?->name === 'admin';
