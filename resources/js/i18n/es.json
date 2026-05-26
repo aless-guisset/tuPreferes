@@ -213,7 +213,16 @@
     "table": "Tabla",
     "registrations": "Registros",
     "last_30_days": "Últimos 30 días",
-    "ban_reason": "Motivo del bloqueo"
+    "ban_reason": "Motivo del bloqueo",
+    "ban_lifted": "Baneo levantado.",
+    "post_hidden_resolved": "Publicación ocultada y denuncia resuelta.",
+    "post_updated": "Publicación actualizada.",
+    "post_deleted_resolved": "Publicación eliminada y denuncia resuelta.",
+    "post_deleted": "Publicación eliminada.",
+    "role_updated": "Rol actualizado.",
+    "report_sent": "Denuncia enviada. Gracias",
+    "user_banned": "Usuario bloqueado.",
+    "user_deleted": "Usuario eliminado."
   },
   "report": {
     "title": "Denunciar esta publicación",

@@ -213,7 +213,16 @@
     "table": "Tabelle",
     "registrations": "Registrierungen",
     "last_30_days": "Letzte 30 Tage",
-    "ban_reason": "Sperrgrund"
+    "ban_reason": "Sperrgrund",
+    "ban_lifted": "Sperre aufgehoben.",
+    "post_hidden_resolved": "Beitrag versteckt und Meldung gelöst.",
+    "post_updated": "Beitrag aktualisiert.",
+    "post_deleted_resolved": "Beitrag gelöscht und Meldung gelöst.",
+    "post_deleted": "Beitrag gelöscht.",
+    "role_updated": "Rolle aktualisiert.",
+    "report_sent": "Meldung gesendet. Danke",
+    "user_banned": "Benutzer gesperrt.",
+    "user_deleted": "Benutzer gelöscht."
   },
   "report": {
     "title": "Diesen Beitrag melden",

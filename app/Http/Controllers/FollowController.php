@@ -89,11 +89,11 @@ class FollowController extends Controller
 
         return Inertia::render('Profile/Followers', [
             'profileUser' => [
-                'id'       => $user->id,
-                'name'     => $user->name,
-                'username' => $user->username,
+                'id'         => $user->id,
+                'name'       => $user->name,
+                'username'   => $user->username,
                 'avatar_url' => $user->avatar_url,
-            ]);
+            ],
             'followers' => $following,
             'tab'       => 'following',
         ]);

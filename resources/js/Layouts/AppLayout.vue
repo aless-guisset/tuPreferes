@@ -77,6 +77,10 @@
         </Link>
 
         <!-- Profil -->
+        <Link v-if="$page.props.auth.user.is_admin" :href="route('admin.index')" class="mobile-nav-btn" :class="{ active: isRoute('admin.index') }">
+          <span style="font-size:1.2rem">🛡️</span>
+          <span>Admin</span>
+        </Link>
         <Link :href="route('profile.show')" class="mobile-nav-btn" :class="{ active: isRoute('profile.show') }">
           <img :src="$page.props.auth.user.avatar_url" class="mobile-avatar" />
           <span>{{ t('nav.profile') }}</span>

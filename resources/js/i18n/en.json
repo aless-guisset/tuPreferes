@@ -213,7 +213,16 @@
     "table": "Table",
     "registrations": "Registrations",
     "last_30_days": "Last 30 days",
-    "ban_reason": "Ban reason"
+    "ban_reason": "Ban reason",
+    "ban_lifted": "Ban lifted.",
+    "post_hidden_resolved": "Post hidden and report resolved.",
+    "post_updated": "Post updated.",
+    "post_deleted_resolved": "Post deleted and report resolved.",
+    "post_deleted": "Post deleted.",
+    "role_updated": "Role updated.",
+    "report_sent": "Report sent. Thank you",
+    "user_banned": "User banned.",
+    "user_deleted": "User deleted."
   },
   "report": {
     "title": "Report this post",

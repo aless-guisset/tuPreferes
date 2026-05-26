@@ -213,7 +213,16 @@
     "table": "Tabel",
     "registrations": "Registraties",
     "last_30_days": "Laatste 30 dagen",
-    "ban_reason": "Reden van verbanning"
+    "ban_reason": "Reden van verbanning",
+    "ban_lifted": "Ban opgeheven.",
+    "post_hidden_resolved": "Bericht verborgen en melding opgelost.",
+    "post_updated": "Bericht bijgewerkt.",
+    "post_deleted_resolved": "Bericht verwijderd en melding opgelost.",
+    "post_deleted": "Bericht verwijderd.",
+    "role_updated": "Rol bijgewerkt.",
+    "report_sent": "Melding verzonden. Bedankt",
+    "user_banned": "Gebruiker verbannen.",
+    "user_deleted": "Gebruiker verwijderd."
   },
   "report": {
     "title": "Dit bericht melden",

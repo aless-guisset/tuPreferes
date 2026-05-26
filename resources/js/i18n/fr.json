@@ -213,7 +213,16 @@
     "table": "Tableau",
     "registrations": "Inscriptions",
     "last_30_days": "30 derniers jours",
-    "ban_reason": "Raison du bannissement"
+    "ban_reason": "Raison du bannissement",
+    "ban_lifted": "Bannissement levé.",
+    "post_hidden_resolved": "Post masqué et signalement résolu.",
+    "post_updated": "Post mis à jour.",
+    "post_deleted_resolved": "Post supprimé et signalement résolu.",
+    "post_deleted": "Post supprimé.",
+    "role_updated": "Rôle mis à jour.",
+    "report_sent": "Signalement envoyé. Merci",
+    "user_banned": "Utilisateur banni.",
+    "user_deleted": "Utilisateur supprimé."
   },
   "report": {
     "title": "Signaler ce post",

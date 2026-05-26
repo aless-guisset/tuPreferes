@@ -6,7 +6,7 @@
         <span class="meta-dot">·</span>
         <span class="meta-time">{{ question.created_at }}</span>
       </div>
-      <Link :href="question.author ? route('profile.public', question.author.id) : '#'" class="card-author" v-if="question.author" style="text-decoration:none">
+      <div class="card-author" v-if="question.author" @click="goToProfile(question.author.id)" style="cursor:pointer">
         <img :src="question.author.avatar_url" :alt="question.author.name" class="author-avatar" />
         <span class="author-name">{{ question.author.name }}</span>
       </div>
@@ -69,7 +69,7 @@
           <ShareIcon /><span>{{ localShares }}</span>
         </button>
       </template>
-      <Link :href="route('questions.show', question.id)" class="action-btn action-link">{{ t('question.see') }}</Link>
+      <Link :href="route('questions.show', question.id)" class="action-btn action-link">{{ t('question.see') }}</div>
       <button
         v-if="$page.props.auth.user && question.author && $page.props.auth.user.id === question.author.id"
         class="action-btn action-danger" @click="deleteQuestion"
