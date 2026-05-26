@@ -69,7 +69,7 @@
           <ShareIcon /><span>{{ localShares }}</span>
         </button>
       </template>
-      <Link :href="route('questions.show', question.id)" class="action-btn action-link">{{ t('question.see') }}</div>
+      <Link :href="route('questions.show', question.id)" class="action-btn action-link">{{ t('question.see') }}</Link>
       <button
         v-if="$page.props.auth.user && question.author && $page.props.auth.user.id === question.author.id"
         class="action-btn action-danger" @click="deleteQuestion"
