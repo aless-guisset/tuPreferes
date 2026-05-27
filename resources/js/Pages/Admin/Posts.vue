@@ -132,10 +132,12 @@ import { ref } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { useToast } from '@/Composables/useToast'
+import { useI18n } from '@/Composables/useI18n'
 import axios from 'axios'
 
 const props  = defineProps({ questions: Object, groups: Object, filters: Object })
 const { add: toast } = useToast()
+const { t } = useI18n()
 const tab    = ref('questions')
 const search = ref(props.filters?.search ?? '')
 
@@ -154,16 +156,16 @@ const goToPage = (page, type) => {
 const toggleHide = async (id, type) => {
   try {
     await axios.patch(route('admin.posts.hide', id), { type })
-    toast('Post mis à jour.')
+    toast(t('admin.post_updated'))
     router.reload()
   } catch { toast('Erreur.', 'error') }
 }
 
 const deletePost = async (id, type) => {
-  if (!confirm('Supprimer ce post définitivement ?')) return
+  if (!confirm(t('admin.confirm_delete_post'))) return
   try {
     await axios.delete(route('admin.posts.delete', id), { data: { type } })
-    toast('Post supprimé.')
+    toast(t('admin.post_deleted'))
     router.reload()
   } catch { toast('Erreur.', 'error') }
 }

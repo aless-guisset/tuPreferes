@@ -222,7 +222,9 @@
     "role_updated": "Rolle aktualisiert.",
     "report_sent": "Meldung gesendet. Danke",
     "user_banned": "Benutzer gesperrt.",
-    "user_deleted": "Benutzer gelöscht."
+    "user_deleted": "Benutzer gelöscht.",
+    "confirm_delete_user": "Dauerhaft löschen ",
+    "confirm_delete_post": "Diesen Beitrag dauerhaft löschen?"
   },
   "report": {
     "title": "Diesen Beitrag melden",

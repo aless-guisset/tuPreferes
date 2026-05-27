@@ -102,10 +102,12 @@ import { ref, reactive } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { useToast } from '@/Composables/useToast'
+import { useI18n } from '@/Composables/useI18n'
 import axios from 'axios'
 
 const props = defineProps({ users: Object, filters: Object })
 const { add: toast } = useToast()
+const { t } = useI18n()
 const search = ref(props.filters?.search ?? '')
 
 let debounce = null
@@ -121,7 +123,7 @@ const goToPage = (page) => router.get(route('admin.users'), { search: search.val
 const updateRole = async (userId, role) => {
   try {
     await axios.patch(route('admin.users.role', userId), { role })
-    toast('Rôle mis à jour.')
+    toast(t('admin.role_updated'))
   } catch { toast('Erreur.', 'error') }
 }
 
@@ -140,7 +142,7 @@ const toggleBan = (user) => {
 const confirmBanDirect = async (user) => {
   try {
     await axios.patch(route('admin.users.ban', user.id), { reason: '' })
-    toast('Bannissement levé.')
+    toast(t('admin.ban_lifted'))
     router.reload()
   } catch { toast('Erreur.', 'error') }
 }
@@ -148,17 +150,17 @@ const confirmBanDirect = async (user) => {
 const confirmBan = async () => {
   try {
     await axios.patch(route('admin.users.ban', banModal.user.id), { reason: banModal.reason })
-    toast('Utilisateur banni.')
+    toast(t('admin.user_banned'))
     banModal.show = false
     router.reload()
   } catch { toast('Erreur.', 'error') }
 }
 
 const deleteUser = async (user) => {
-  if (!confirm('Supprimer définitivement ' + user.name + ' ?')) return
+  if (!confirm(t('admin.confirm_delete_user') + user.name + ' ?')) return
   try {
     await axios.delete(route('admin.users.delete', user.id))
-    toast('Utilisateur supprimé.')
+    toast(t('admin.user_deleted'))
     router.reload()
   } catch { toast('Erreur.', 'error') }
 }

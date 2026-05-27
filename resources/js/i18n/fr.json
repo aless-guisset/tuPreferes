@@ -222,7 +222,9 @@
     "role_updated": "Rôle mis à jour.",
     "report_sent": "Signalement envoyé. Merci",
     "user_banned": "Utilisateur banni.",
-    "user_deleted": "Utilisateur supprimé."
+    "user_deleted": "Utilisateur supprimé.",
+    "confirm_delete_user": "Supprimer définitivement ",
+    "confirm_delete_post": "Supprimer ce post définitivement ?"
   },
   "report": {
     "title": "Signaler ce post",

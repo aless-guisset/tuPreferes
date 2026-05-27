@@ -222,7 +222,9 @@
     "role_updated": "Rol actualizado.",
     "report_sent": "Denuncia enviada. Gracias",
     "user_banned": "Usuario bloqueado.",
-    "user_deleted": "Usuario eliminado."
+    "user_deleted": "Usuario eliminado.",
+    "confirm_delete_user": "Eliminar permanentemente ",
+    "confirm_delete_post": "¿Eliminar esta publicación permanentemente?"
   },
   "report": {
     "title": "Denunciar esta publicación",

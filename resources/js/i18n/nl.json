@@ -222,7 +222,9 @@
     "role_updated": "Rol bijgewerkt.",
     "report_sent": "Melding verzonden. Bedankt",
     "user_banned": "Gebruiker verbannen.",
-    "user_deleted": "Gebruiker verwijderd."
+    "user_deleted": "Gebruiker verwijderd.",
+    "confirm_delete_user": "Permanent verwijderen ",
+    "confirm_delete_post": "Dit bericht permanent verwijderen?"
   },
   "report": {
     "title": "Dit bericht melden",

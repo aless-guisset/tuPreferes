@@ -71,10 +71,12 @@
 import { Link, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { useToast } from '@/Composables/useToast'
+import { useI18n } from '@/Composables/useI18n'
 import axios from 'axios'
 
 const props = defineProps({ reports: Object })
 const { add: toast } = useToast()
+const { t } = useI18n()
 
 const reasonLabel = (r) => ({
   inapproprie:        '🔞 Inapproprié',
@@ -97,18 +99,18 @@ const hidePost = async (r) => {
     const type = r.reportable_type === 'Question' ? 'question' : r.reportable_type.toLowerCase()
     await axios.patch(route('admin.posts.hide', r.reportable_id), { type })
     await axios.patch(route('admin.reports.resolve', r.id), { action: 'resolve' })
-    toast('Post masqué et signalement résolu.')
+    toast(t('admin.post_hidden_resolved'))
     router.reload()
   } catch { toast('Erreur.', 'error') }
 }
 
 const deletePost = async (r) => {
-  if (!confirm('Supprimer ce post définitivement ?')) return
+  if (!confirm(t('admin.confirm_delete_post'))) return
   try {
     const type = r.reportable_type === 'Question' ? 'question' : r.reportable_type.toLowerCase()
     await axios.delete(route('admin.posts.delete', r.reportable_id), { data: { type } })
     await axios.patch(route('admin.reports.resolve', r.id), { action: 'resolve' })
-    toast('Post supprimé et signalement résolu.')
+    toast(t('admin.post_deleted_resolved'))
     router.reload()
   } catch { toast('Erreur.', 'error') }
 }
