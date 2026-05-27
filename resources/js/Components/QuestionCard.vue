@@ -81,24 +81,24 @@
   <Teleport to="body">
     <div v-if="reportModal" class="modal-overlay" @click.self="reportModal = false">
       <div class="modal-box card">
-        <h3 class="font-display modal-title">🚩 Signaler ce post</h3>
+        <h3 class="font-display modal-title">🚩 {{ t('report.title') }}</h3>
         <div class="field">
-          <label class="field-label">Raison</label>
+          <label class="field-label">{{ t('admin.reason') }}</label>
           <select v-model="reportReason" class="field-input">
-            <option value="inapproprie">Inapproprié</option>
-            <option value="spam">Spam</option>
-            <option value="harcelement">Harcèlement</option>
-            <option value="fausse_information">Fausse information</option>
-            <option value="autre">Autre</option>
+            <option value="inapproprie">{{ t('report.reason_inapproprie') }}</option>
+            <option value="spam">{{ t('report.reason_spam') }}</option>
+            <option value="harcelement">{{ t('report.reason_harcelement') }}</option>
+            <option value="fausse_information">{{ t('report.reason_fausse_info') }}</option>
+            <option value="autre">{{ t('report.reason_autre') }}</option>
           </select>
         </div>
         <div class="field">
-          <label class="field-label">Commentaire (optionnel)</label>
-          <textarea v-model="reportComment" class="field-input" rows="3" placeholder="Décris le problème..." />
+          <label class="field-label">{{ t('report.comment') }}</label>
+          <textarea v-model="reportComment" class="field-input" rows="3" :placeholder="t('report.comment_placeholder')" />
         </div>
         <div class="modal-actions">
-          <button class="btn-ghost" @click="reportModal = false">Annuler</button>
-          <button class="btn-primary" @click="submitReport">Envoyer le signalement</button>
+          <button class="btn-ghost" @click="reportModal = false">{{ t('report.cancel') }}</button>
+          <button class="btn-primary" @click="submitReport">{{ t('report.send') }}</button>
         </div>
       </div>
     </div>
@@ -144,7 +144,7 @@ const submitReport = async () => {
     })
     reportModal.value   = false
     reportComment.value = ''
-    toast('Signalement envoyé. Merci')
+    toast(t('report.success'))
   } catch { toast('Erreur.', 'error') }
 }
 

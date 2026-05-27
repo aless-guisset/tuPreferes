@@ -27,7 +27,8 @@
     "join_btn": "Sign up for free",
     "dilemma_title": "Start a dilemma!",
     "dilemma_sub": "Create your own question, group or elimination tournament.",
-    "stats_contents": "Contents"
+    "stats_contents": "Contents",
+    "stats_title": "Global stats"
   },
   "filters": {
     "all": "All",
@@ -61,7 +62,10 @@
     "completed": "✓ Completed",
     "finished": "Group completed!",
     "finished_sub": "You answered all the questions.",
-    "questions_count_simple": "questions"
+    "questions_count_simple": "questions",
+    "items_simple": "items",
+    "subtitle": "Series of questions and elimination tournaments",
+    "empty_groups_sub": "Be the first to create a group or tournament!"
   },
   "elimination": {
     "title": "Elimination",

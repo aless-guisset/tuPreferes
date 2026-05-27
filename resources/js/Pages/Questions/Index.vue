@@ -16,7 +16,7 @@
         <div class="sidebar-card">
           <h3 class="sidebar-title font-display">{{ t("filters.categories") }}</h3>
           <nav class="category-nav">
-            <button class="cat-btn" :class="{ active: !filters.category }" @click="filterBy('category', null)">🎲 Toutes</button>
+            <button class="cat-btn" :class="{ active: !filters.category }" @click="filterBy('category', null)">🎲 {{ t("filters.all") }}</button>
             <button v-for="cat in allCategories" :key="cat" class="cat-btn" :class="{ active: filters.category === cat }" @click="filterBy('category', cat)">{{ catEmoji(cat) }} {{ cat }}</button>
           </nav>
         </div>
@@ -98,7 +98,7 @@
               <div class="gc-footer">
                 <span v-if="item.completed" class="gc-done">✓ {{ t("group.completed") }}</span>
                 <Link :href="route('groups.show', item.id)" class="btn-primary gc-btn">
-                  {{ item.type === 'elimination' ? '⚔️ Jouer' : '▶ Commencer' }}
+                  {{ item.type === 'elimination' ? '⚔️ ' + t('group.play') : '▶ ' + t('group.start') }}
                 </Link>
               </div>
             </div>
@@ -108,8 +108,8 @@
         <div v-else class="empty-state">
           <div class="empty-emoji">🤔</div>
           <h2 class="font-display">{{ t("home.empty") }}</h2>
-          <p>Sois le premier à en poser une !</p>
-          <Link v-if="$page.props.auth.user" :href="route('groups.create')" class="btn-primary">Créer</Link>
+          <p>{{ t("home.empty_sub") }}</p>
+          <Link v-if="$page.props.auth.user" :href="route('groups.create')" class="btn-primary">{{ t("home.create_cta") }}</Link>
         </div>
 
         <!-- Pagination -->
@@ -123,18 +123,18 @@
         <div v-if="!$page.props.auth.user" class="sidebar-card cta-card">
           <div class="cta-emoji">🎮</div>
           <h3 class="font-display cta-title">{{ t("home.join_title") }} !</h3>
-          <p class="cta-text">Connecte-toi pour voter, liker et créer tes propres questions.</p>
-          <Link :href="route('register')" class="btn-primary" style="width:100%;justify-content:center;">S'inscrire</Link>
-          <Link :href="route('login')" class="btn-ghost" style="width:100%;justify-content:center;margin-top:.5rem;">Se connecter</Link>
+          <p class="cta-text">{{ t("home.join_sub") }}</p>
+          <Link :href="route('register')" class="btn-primary" style="width:100%;justify-content:center;">{{ t("home.join_btn") }}</Link>
+          <Link :href="route('login')" class="btn-ghost" style="width:100%;justify-content:center;margin-top:.5rem;">{{ t("nav.login") }}</Link>
         </div>
         <div v-else class="sidebar-card cta-card">
           <div class="cta-emoji">✏️</div>
           <h3 class="font-display cta-title">{{ t("home.dilemma_title") }} !</h3>
-          <p class="cta-text">Crée ta propre question, groupe ou tournoi éliminatoire.</p>
-          <Link :href="route('groups.create')" class="btn-primary" style="width:100%;justify-content:center;">Créer</Link>
+          <p class="cta-text">{{ t("home.dilemma_sub") }}</p>
+          <Link :href="route('groups.create')" class="btn-primary" style="width:100%;justify-content:center;">{{ t("home.create_cta") }}</Link>
         </div>
         <div class="sidebar-card">
-          <h3 class="sidebar-title font-display">Stats globales</h3>
+          <h3 class="sidebar-title font-display">{{ t("home.stats_title") }}</h3>
           <div class="global-stats">
             <div class="gstat"><span class="gstat-num font-display">{{ questions.total }}</span><span class="gstat-label">{{ t("home.stats_contents") }}</span></div>
           </div>
@@ -148,7 +148,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useI18n } from '@/Composables/useI18n'
-import { Link, router } from '@inertiajs/vue3'
+import { Link, router, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import QuestionCard from '@/Components/QuestionCard.vue'
 import SearchBar from '@/Components/SearchBar.vue'
@@ -157,11 +157,11 @@ const { t } = useI18n()
 const props = defineProps({ questions: Object, suggestions: Array, filters: Object, categories: Array })
 
 const allCategories = ['amour','aventure','nourriture','technologie','voyage','sport','musique','cinéma','divers']
-const sorts = [
-  { value: 'recent',  label: '🕐 {{ t("filters.sort_recent") }}' },
-  { value: 'popular', label: '❤️ {{ t("filters.sort_popular") }}' },
-  { value: 'votes',   label: '🔥 {{ t("filters.sort_votes") }}' },
-]
+const sorts = computed(() => [
+  { value: 'recent',  label: '🕐 ' + t('filters.sort_recent') },
+  { value: 'popular', label: '❤️ ' + t('filters.sort_popular') },
+  { value: 'votes',   label: '🔥 ' + t('filters.sort_votes') },
+])
 
 const catEmoji = (c) => ({ amour:'❤️', aventure:'🗺️', nourriture:'🍕', technologie:'💻', voyage:'✈️', sport:'⚽', musique:'🎵', 'cinéma':'🎬', divers:'🎲' })[c] || '🎲'
 

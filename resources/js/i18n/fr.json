@@ -27,7 +27,8 @@
     "join_btn": "S'inscrire gratuitement",
     "dilemma_title": "Lance un dilemme !",
     "dilemma_sub": "Crée ta propre question, groupe ou tournoi éliminatoire.",
-    "stats_contents": "Contenus"
+    "stats_contents": "Contenus",
+    "stats_title": "Stats globales"
   },
   "filters": {
     "all": "Tous",
@@ -61,7 +62,10 @@
     "completed": "✓ Terminé",
     "finished": "Groupe terminé !",
     "finished_sub": "Tu as répondu à toutes les questions.",
-    "questions_count_simple": "questions"
+    "questions_count_simple": "questions",
+    "items_simple": "items",
+    "subtitle": "Des séries de questions et des tournois éliminatoires",
+    "empty_groups_sub": "Sois le premier à créer un groupe ou un tournoi !"
   },
   "elimination": {
     "title": "Éliminatoire",

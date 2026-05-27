@@ -16,8 +16,8 @@
         <h2 class="font-display">{{ t("elimination.start_title") }} !</h2>
         <p>Il faut un compte pour participer au tournoi.</p>
         <div class="auth-btns">
-          <Link :href="route('login')" class="btn-primary">Se connecter</Link>
-          <Link :href="route('register')" class="btn-ghost">S'inscrire</Link>
+          <Link :href="route('login')" class="btn-primary">{{ t('nav.login') }}</Link>
+          <Link :href="route('register')" class="btn-ghost">{{ t('nav.register') }}</Link>
         </div>
       </div>
 
@@ -34,7 +34,7 @@
           <span v-if="items.length > 8" class="item-chip item-chip-more">+{{ items.length - 8 }}</span>
         </div>
         <button class="btn-primary start-btn" @click="startTournament" :disabled="starting">
-          {{ starting ? '⏳ Démarrage...' : '🚀 Commencer le tournoi' }}
+          {{ starting ? '⏳ ' + t('common.loading') : t('elimination.start_btn') }}
         </button>
       </div>
 
@@ -42,7 +42,7 @@
       <div v-else-if="!localSession.completed" class="duel-screen">
         <div class="duel-progress card">
           <div class="duel-progress-info">
-            <span class="font-display duel-remaining">{{ localSession.remaining_count }} restants</span>
+            <span class="font-display duel-remaining">{{ tp('elimination.remaining', localSession.remaining_count) }}</span>
             <span class="duel-hint">{{ t("elimination.hint") }} !</span>
           </div>
           <div class="duel-progress-bar">
@@ -79,7 +79,7 @@
 
         <div v-if="localStats?.length" class="global-stats card">
           <h3 class="font-display stats-title">{{ t("elimination.community") }}</h3>
-          <p class="stats-subtitle">{{ totalSessions }} joueur{{ totalSessions > 1 ? 's' : '' }} ont terminé ce tournoi</p>
+          <p class="stats-subtitle">{{ tp('elimination.players', totalSessions) }}</p>
           <div class="stats-list">
             <div v-for="(s, i) in localStats" :key="i" class="stat-row">
               <span class="stat-rank font-display">{{ i + 1 }}</span>
@@ -108,7 +108,7 @@ import { useToast } from '@/Composables/useToast'
 
 const props = defineProps({ group: Object, items: Array, session: Object, duel: Object, stats: Array })
 const { add: toast } = useToast()
-const { t } = useI18n()
+const { t, tp } = useI18n()
 
 const starting     = ref(false)
 const choosing     = ref(false)
@@ -132,7 +132,7 @@ const startTournament = async () => {
     currentDuel.value  = data.duel
     duelKey.value++
   } catch (e) {
-    toast('t("common.error")', 'error')
+    toast(t('common.error'), 'error')
   } finally {
     starting.value = false
   }
@@ -146,7 +146,7 @@ const choose = async (winnerId) => {
     localSession.value = { remaining_count: data.remaining_count, completed: data.completed, winner: data.winner ?? null }
     if (data.completed) {
       localStats.value = data.stats
-      toast('t("elimination.champion")', 'success')
+      toast(t('elimination.champion'), 'success')
     } else {
       currentDuel.value = data.duel
       duelKey.value++

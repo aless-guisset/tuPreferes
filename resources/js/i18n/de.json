@@ -27,7 +27,8 @@
     "join_btn": "Kostenlos registrieren",
     "dilemma_title": "Starte ein Dilemma!",
     "dilemma_sub": "Erstelle deine eigene Frage, Gruppe oder ein Eliminierungsturnier.",
-    "stats_contents": "Inhalte"
+    "stats_contents": "Inhalte",
+    "stats_title": "Globale Statistiken"
   },
   "filters": {
     "all": "Alle",
@@ -61,7 +62,10 @@
     "completed": "✓ Abgeschlossen",
     "finished": "Gruppe abgeschlossen!",
     "finished_sub": "Du hast alle Fragen beantwortet.",
-    "questions_count_simple": "Fragen"
+    "questions_count_simple": "Fragen",
+    "items_simple": "Elemente",
+    "subtitle": "Fragenreihen und Eliminierungsturniere",
+    "empty_groups_sub": "Sei der Erste, der eine Gruppe oder ein Turnier erstellt!"
   },
   "elimination": {
     "title": "Eliminierung",

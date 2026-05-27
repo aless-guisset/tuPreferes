@@ -8,10 +8,10 @@
 
       <!-- Sélecteur de type -->
       <div class="type-selector">
-        <button v-for="t in types" :key="t.id" class="type-card" :class="{ active: form.type === t.id }" @click="form.type = t.id">
-          <span class="type-icon">{{ t.icon }}</span>
-          <span class="type-label font-display">{{ t.label }}</span>
-          <span class="type-desc">{{ t.desc }}</span>
+        <button v-for="tp in types" :key="tp.id" class="type-card" :class="{ active: form.type === tp.id }" @click="form.type = tp.id">
+          <span class="type-icon">{{ tp.icon }}</span>
+          <span class="type-label font-display">{{ tp.label }}</span>
+          <span class="type-desc">{{ tp.desc }}</span>
         </button>
       </div>
 
@@ -146,7 +146,7 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { useI18n } from '@/Composables/useI18n'
 import { Link, router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
@@ -156,11 +156,11 @@ const { add: toast } = useToast()
 const { t } = useI18n()
 const loading = ref(false)
 
-const types = [
-  { id: 'simple',      icon: '⚡', label: 'Simple',      desc: '{{ t("create.type_simple_desc") }}' },
-  { id: 'group',       icon: '📦', label: 'Groupe',       desc: '{{ t("create.type_group_desc") }}' },
-  { id: 'elimination', icon: '🏆', label: 'Éliminatoire', desc: 'Tournoi jusqu\'au dernier' },
-]
+const types = computed(() => [
+  { id: 'simple',      icon: '⚡', label: t('create.type_simple_label'), desc: t('create.type_simple_desc') },
+  { id: 'group',       icon: '📦', label: t('create.type_group_label'),  desc: t('create.type_group_desc') },
+  { id: 'elimination', icon: '🏆', label: t('create.type_elim_label'),   desc: t('create.type_elim_desc') },
+])
 
 const categories = [
   { value: 'amour', label: 'Amour', emoji: '❤️' },
@@ -205,7 +205,7 @@ const submitSimple = () => {
   d.append('is_anonymous', form.is_anonymous ? '1' : '0')
   d.append('type', 'simple')
   form.options.forEach((o, i) => { d.append(`options[${i}][label]`, o.label); if (o.image) d.append(`options[${i}][image]`, o.image); if (o.audio) d.append(`options[${i}][audio]`, o.audio) })
-  router.post(route('groups.store'), d, { onError: (e) => toast('t("create.fix_errors")', 'error'), onFinish: () => { loading.value = false } })
+  router.post(route('groups.store'), d, { onError: (e) => toast(t('create.fix_errors'), 'error'), onFinish: () => { loading.value = false } })
 }
 
 const submitGroup = () => {
@@ -217,7 +217,7 @@ const submitGroup = () => {
   d.append('category', form.category)
   d.append('is_anonymous', form.is_anonymous ? '1' : '0')
   form.groupQuestions.forEach((q, qi) => { if (q.title) d.append(`questions[${qi}][title]`, q.title); q.options.forEach((o, oi) => { d.append(`questions[${qi}][options][${oi}][label]`, o.label); if (o.image) d.append(`questions[${qi}][options][${oi}][image]`, o.image) }) })
-  router.post(route('groups.store'), d, { onError: (e) => toast('t("create.fix_errors")', 'error'), onFinish: () => { loading.value = false } })
+  router.post(route('groups.store'), d, { onError: (e) => toast(t('create.fix_errors'), 'error'), onFinish: () => { loading.value = false } })
 }
 
 const submitElim = () => {
@@ -229,7 +229,7 @@ const submitElim = () => {
   d.append('order', form.elimOrder)
   d.append('is_anonymous', form.is_anonymous ? '1' : '0')
   form.elimItems.forEach((item, i) => { d.append(`items[${i}][label]`, item.label); if (item.image) d.append(`items[${i}][image]`, item.image) })
-  router.post(route('groups.store'), d, { onError: (e) => toast('t("create.fix_errors")', 'error'), onFinish: () => { loading.value = false } })
+  router.post(route('groups.store'), d, { onError: (e) => toast(t('create.fix_errors'), 'error'), onFinish: () => { loading.value = false } })
 }
 </script>
 

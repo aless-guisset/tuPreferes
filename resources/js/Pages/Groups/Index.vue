@@ -4,9 +4,9 @@
       <div class="page-header">
         <div>
           <h1 class="font-display page-title">{{ t("nav.groups") }}</h1>
-          <p class="page-sub">Des séries de questions et des tournois éliminatoires</p>
+          <p class="page-sub">{{ t("group.subtitle") }}</p>
         </div>
-        <Link v-if="$page.props.auth.user" :href="route('groups.create')" class="btn-primary">+ Créer</Link>
+        <Link v-if="$page.props.auth.user" :href="route('groups.create')" class="btn-primary">+ {{ t("home.create_cta") }}</Link>
       </div>
       <div class="type-filters">
         <button class="type-filter" :class="{ active: filter === 'all' }" @click="filter = 'all'">{{ t("filters.all") }}</button>
@@ -22,7 +22,7 @@
           <h2 class="font-display gc-title">{{ g.title }}</h2>
           <p v-if="g.description" class="gc-desc">{{ g.description }}</p>
           <div class="gc-meta">
-            <span>{{ g.total_questions }} {{ g.type === 'elimination' ? 'items' : 'questions' }}</span>
+            <span>{{ g.total_questions }} {{ g.type === 'elimination' ? t('group.items_simple') : t('group.questions_count_simple') }}</span>
             <span v-if="g.author" class="gc-author"><img :src="g.author.avatar_url" class="gc-avatar" />{{ g.author.name }}</span>
           </div>
           <div v-if="g.type === 'group' && $page.props.auth.user && g.current_position > 0" class="gc-progress">
@@ -38,8 +38,8 @@
       <div v-else class="empty-state">
         <div class="empty-emoji">📦</div>
         <h2 class="font-display">{{ t("home.empty") }}</h2>
-        <p>Sois le premier à créer un groupe ou un tournoi !</p>
-        <Link v-if="$page.props.auth.user" :href="route('groups.create')" class="btn-primary">Créer</Link>
+        <p>{{ t("group.empty_groups_sub") }}</p>
+        <Link v-if="$page.props.auth.user" :href="route('groups.create')" class="btn-primary">{{ t("home.create_cta") }}</Link>
       </div>
     </div>
   </AppLayout>

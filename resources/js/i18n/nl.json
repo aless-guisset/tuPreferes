@@ -27,7 +27,8 @@
     "join_btn": "Gratis registreren",
     "dilemma_title": "Start een dilemma!",
     "dilemma_sub": "Maak je eigen vraag, groep of eliminatietoernooi.",
-    "stats_contents": "Inhoud"
+    "stats_contents": "Inhoud",
+    "stats_title": "Globale statistieken"
   },
   "filters": {
     "all": "Alle",
@@ -61,7 +62,10 @@
     "completed": "✓ Voltooid",
     "finished": "Groep voltooid!",
     "finished_sub": "Je hebt alle vragen beantwoord.",
-    "questions_count_simple": "vragen"
+    "questions_count_simple": "vragen",
+    "items_simple": "items",
+    "subtitle": "Reeksen vragen en eliminatietoernooien",
+    "empty_groups_sub": "Wees de eerste om een groep of toernooi te maken!"
   },
   "elimination": {
     "title": "Eliminatie",
