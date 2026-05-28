@@ -2,13 +2,13 @@
   <AppLayout>
     <div class="admin-layout">
       <div class="admin-header">
-        <h1 class="font-display admin-title">📈 Analytics</h1>
+        <h1 class="font-display admin-title">📈 {{ t('admin.analytics') }}</h1>
         <div class="admin-nav">
-          <Link :href="route('admin.index')"     class="admin-nav-btn">📊 Dashboard</Link>
-          <Link :href="route('admin.users')"     class="admin-nav-btn">👥 Utilisateurs</Link>
-          <Link :href="route('admin.posts')"     class="admin-nav-btn">📝 Posts</Link>
-          <Link :href="route('admin.reports')"   class="admin-nav-btn">🚩 Signalements</Link>
-          <Link :href="route('admin.analytics')" class="admin-nav-btn active">📈 Analytics</Link>
+          <Link :href="route('admin.index')"     class="admin-nav-btn">📊 {{ t('admin.dashboard') }}</Link>
+          <Link :href="route('admin.users')"     class="admin-nav-btn">👥 {{ t('admin.users') }}</Link>
+          <Link :href="route('admin.posts')"     class="admin-nav-btn">📝 {{ t('admin.posts') }}</Link>
+          <Link :href="route('admin.reports')"   class="admin-nav-btn">🚩 {{ t('admin.reports') }}</Link>
+          <Link :href="route('admin.analytics')" class="admin-nav-btn active">📈 {{ t('admin.analytics') }}</Link>
         </div>
       </div>
 
@@ -17,45 +17,45 @@
         <div class="stat-card card">
           <span class="stat-icon">👥</span>
           <span class="stat-num font-display">{{ stats.total_users }}</span>
-          <span class="stat-label">Utilisateurs total</span>
+          <span class="stat-label">{{ t('admin.total_users') }}</span>
         </div>
         <div class="stat-card card">
           <span class="stat-icon">📝</span>
           <span class="stat-num font-display">{{ stats.total_questions }}</span>
-          <span class="stat-label">Questions total</span>
+          <span class="stat-label">{{ t('admin.total_questions') }}</span>
         </div>
         <div class="stat-card card">
           <span class="stat-icon">🗳️</span>
           <span class="stat-num font-display">{{ stats.total_votes }}</span>
-          <span class="stat-label">Votes total</span>
+          <span class="stat-label">{{ t('admin.total_votes') }}</span>
         </div>
         <div class="stat-card card">
           <span class="stat-icon">🆕</span>
           <span class="stat-num font-display">{{ stats.new_users_today }}</span>
-          <span class="stat-label">Nouveaux aujourd'hui</span>
+          <span class="stat-label">{{ t('admin.new_today').replace('{n}', '') }}</span>
         </div>
       </div>
 
       <!-- Switch graphique / tableau -->
       <div class="view-switch">
         <button class="switch-btn" :class="{ active: view === 'chart' }" @click="view = 'chart'">
-          📊 Graphique
+          📊 {{ t('admin.chart') }}
         </button>
         <button class="switch-btn" :class="{ active: view === 'table' }" @click="view = 'table'">
-          📋 Tableau
+          📋 {{ t('admin.table') }}
         </button>
       </div>
 
       <!-- Sélecteur de métrique -->
       <div class="metric-selector">
-        <button class="metric-btn" :class="{ active: metric === 'registrations' }" @click="metric = 'registrations'">👥 Inscriptions</button>
-        <button class="metric-btn" :class="{ active: metric === 'votes' }" @click="metric = 'votes'">🗳️ Votes</button>
-        <button class="metric-btn" :class="{ active: metric === 'questions' }" @click="metric = 'questions'">❓ Questions</button>
+        <button class="metric-btn" :class="{ active: metric === 'registrations' }" @click="metric = 'registrations'">👥 {{ t('admin.metric_registrations') }}</button>
+        <button class="metric-btn" :class="{ active: metric === 'votes' }" @click="metric = 'votes'">🗳️ {{ t('admin.metric_votes') }}</button>
+        <button class="metric-btn" :class="{ active: metric === 'questions' }" @click="metric = 'questions'">❓ {{ t('admin.metric_questions') }}</button>
       </div>
 
       <!-- GRAPHIQUE -->
       <div v-if="view === 'chart'" class="chart-card card">
-        <h3 class="font-display chart-title">{{ metricLabel }} — 30 derniers jours</h3>
+        <h3 class="font-display chart-title">{{ metricLabel }} {{ t('admin.last_30_days_suffix') }}</h3>
         <div class="chart-wrap">
           <div class="chart-bars">
             <div
@@ -83,13 +83,13 @@
 
       <!-- TABLEAU -->
       <div v-if="view === 'table'" class="table-wrap card">
-        <h3 class="font-display chart-title" style="padding:1.25rem 1.25rem 0">{{ metricLabel }} — 30 derniers jours</h3>
+        <h3 class="font-display chart-title" style="padding:1.25rem 1.25rem 0">{{ metricLabel }} {{ t('admin.last_30_days_suffix') }}</h3>
         <table class="admin-table">
           <thead>
             <tr>
-              <th>Date</th>
+              <th>{{ t('admin.col_date') }}</th>
               <th>{{ metricLabel }}</th>
-              <th>Évolution</th>
+              <th>{{ t('admin.registrations') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -113,6 +113,7 @@
 import { ref, computed } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import { useI18n } from '@/Composables/useI18n'
 
 const props = defineProps({
   stats: Object,
@@ -121,6 +122,7 @@ const props = defineProps({
   questions: Array,
 })
 
+const { t } = useI18n()
 const view   = ref('chart')
 const metric = ref('registrations')
 
@@ -131,9 +133,9 @@ const currentData = computed(() => ({
 })[metric.value] ?? [])
 
 const metricLabel = computed(() => ({
-  registrations: 'Inscriptions',
-  votes:         'Votes',
-  questions:     'Questions créées',
+  registrations: t('admin.metric_registrations'),
+  votes:         t('admin.metric_votes'),
+  questions:     t('admin.metric_questions'),
 })[metric.value])
 
 const maxVal = computed(() => Math.max(...currentData.value.map(d => d.count), 1))

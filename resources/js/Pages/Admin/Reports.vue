@@ -2,20 +2,20 @@
   <AppLayout>
     <div class="admin-layout">
       <div class="admin-header">
-        <h1 class="font-display admin-title">🚩 Signalements</h1>
+        <h1 class="font-display admin-title">🚩 {{ t('admin.reports') }}</h1>
         <div class="admin-nav">
-          <Link :href="route('admin.index')"     class="admin-nav-btn">📊 Dashboard</Link>
-          <Link :href="route('admin.users')"     class="admin-nav-btn">👥 Utilisateurs</Link>
-          <Link :href="route('admin.posts')"     class="admin-nav-btn">📝 Posts</Link>
-          <Link :href="route('admin.reports')"   class="admin-nav-btn active">🚩 Signalements</Link>
-          <Link :href="route('admin.analytics')" class="admin-nav-btn">📈 Analytics</Link>
+          <Link :href="route('admin.index')"     class="admin-nav-btn">📊 {{ t('admin.dashboard') }}</Link>
+          <Link :href="route('admin.users')"     class="admin-nav-btn">👥 {{ t('admin.users') }}</Link>
+          <Link :href="route('admin.posts')"     class="admin-nav-btn">📝 {{ t('admin.posts') }}</Link>
+          <Link :href="route('admin.reports')"   class="admin-nav-btn active">🚩 {{ t('admin.reports') }}</Link>
+          <Link :href="route('admin.analytics')" class="admin-nav-btn">📈 {{ t('admin.analytics') }}</Link>
         </div>
       </div>
 
       <div v-if="reports.data.length === 0" class="empty-state card">
         <div class="empty-icon">✅</div>
-        <h2 class="font-display">Aucun signalement en attente</h2>
-        <p>Tout est propre !</p>
+        <h2 class="font-display">{{ t('admin.no_reports') }}</h2>
+        <p>{{ t('admin.all_clear') }}</p>
       </div>
 
       <div v-else class="reports-list">
@@ -36,25 +36,22 @@
           </div>
 
           <div class="report-reporter">
-            Signalé par <strong>{{ r.reporter.name }}</strong> ({{ r.reporter.email }})
+            {{ t('admin.reported_by') }} <strong>{{ r.reporter.name }}</strong> ({{ r.reporter.email }})
           </div>
 
           <div class="report-actions">
             <!-- Masquer le post -->
             <button class="action-btn-md btn-orange" @click="hidePost(r)">
-              🙈 Masquer le post
+              🙈 {{ t('admin.hide_post_btn') }}
             </button>
-            <!-- Supprimer le post -->
             <button class="action-btn-md btn-red" @click="deletePost(r)">
-              🗑️ Supprimer le post
+              🗑️ {{ t('admin.delete_post_btn') }}
             </button>
-            <!-- Résoudre sans action -->
             <button class="action-btn-md btn-green" @click="resolve(r.id, 'resolve')">
-              ✅ Résolu
+              ✅ {{ t('admin.resolve') }}
             </button>
-            <!-- Rejeter le signalement -->
             <button class="action-btn-md btn-ghost" @click="resolve(r.id, 'reject')">
-              ❌ Rejeter
+              ❌ {{ t('admin.reject') }}
             </button>
           </div>
         </div>
@@ -79,19 +76,19 @@ const { add: toast } = useToast()
 const { t } = useI18n()
 
 const reasonLabel = (r) => ({
-  inapproprie:        '🔞 Inapproprié',
-  spam:               '📨 Spam',
-  'harcèlement':      '😡 Harcèlement',
-  fausse_information: '❌ Fausse info',
-  autre:              '❓ Autre',
+  inapproprie:        '🔞 ' + t('report.reason_inapproprie'),
+  spam:               '📨 ' + t('report.reason_spam'),
+  'harcèlement':      '😡 ' + t('report.reason_harcelement'),
+  fausse_information: '❌ ' + t('report.reason_fausse_info'),
+  autre:              '❓ ' + t('report.reason_autre'),
 })[r] ?? r
 
 const resolve = async (id, action) => {
   try {
     await axios.patch(route('admin.reports.resolve', id), { action })
-    toast(action === 'resolve' ? 'Signalement résolu.' : 'Signalement rejeté.')
+    toast(action === 'resolve' ? t('admin.report_resolved') : t('admin.report_rejected'))
     router.reload()
-  } catch { toast('Erreur.', 'error') }
+  } catch { toast(t('common.error'), 'error') }
 }
 
 const hidePost = async (r) => {
@@ -101,7 +98,7 @@ const hidePost = async (r) => {
     await axios.patch(route('admin.reports.resolve', r.id), { action: 'resolve' })
     toast(t('admin.post_hidden_resolved'))
     router.reload()
-  } catch { toast('Erreur.', 'error') }
+  } catch { toast(t('common.error'), 'error') }
 }
 
 const deletePost = async (r) => {
@@ -112,7 +109,7 @@ const deletePost = async (r) => {
     await axios.patch(route('admin.reports.resolve', r.id), { action: 'resolve' })
     toast(t('admin.post_deleted_resolved'))
     router.reload()
-  } catch { toast('Erreur.', 'error') }
+  } catch { toast(t('common.error'), 'error') }
 }
 
 const goToPage = (page) => router.get(route('admin.reports'), { page }, { preserveScroll: false })

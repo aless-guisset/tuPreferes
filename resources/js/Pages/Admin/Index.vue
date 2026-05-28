@@ -3,13 +3,13 @@
     <div class="admin-layout">
       <!-- Header -->
       <div class="admin-header">
-        <h1 class="font-display admin-title">🛡️ Panel Admin</h1>
+        <h1 class="font-display admin-title">🛡️ {{ t('admin.title') }}</h1>
         <div class="admin-nav">
-          <Link :href="route('admin.index')"      class="admin-nav-btn" :class="{ active: isRoute('admin.index') }">📊 Dashboard</Link>
-          <Link :href="route('admin.users')"      class="admin-nav-btn" :class="{ active: isRoute('admin.users') }">👥 Utilisateurs</Link>
-          <Link :href="route('admin.posts')"      class="admin-nav-btn" :class="{ active: isRoute('admin.posts') }">📝 Posts</Link>
-          <Link :href="route('admin.reports')"    class="admin-nav-btn" :class="{ active: isRoute('admin.reports') }">🚩 Signalements <span v-if="stats.total_reports > 0" class="badge">{{ stats.total_reports }}</span></Link>
-          <Link :href="route('admin.analytics')"  class="admin-nav-btn" :class="{ active: isRoute('admin.analytics') }">📈 Analytics</Link>
+          <Link :href="route('admin.index')"      class="admin-nav-btn" :class="{ active: isRoute('admin.index') }">📊 {{ t('admin.dashboard') }}</Link>
+          <Link :href="route('admin.users')"      class="admin-nav-btn" :class="{ active: isRoute('admin.users') }">👥 {{ t('admin.users') }}</Link>
+          <Link :href="route('admin.posts')"      class="admin-nav-btn" :class="{ active: isRoute('admin.posts') }">📝 {{ t('admin.posts') }}</Link>
+          <Link :href="route('admin.reports')"    class="admin-nav-btn" :class="{ active: isRoute('admin.reports') }">🚩 {{ t('admin.reports') }} <span v-if="stats.total_reports > 0" class="badge">{{ stats.total_reports }}</span></Link>
+          <Link :href="route('admin.analytics')"  class="admin-nav-btn" :class="{ active: isRoute('admin.analytics') }">📈 {{ t('admin.analytics') }}</Link>
         </div>
       </div>
 
@@ -19,54 +19,54 @@
           <div class="stat-icon">👥</div>
           <div class="stat-info">
             <span class="stat-num font-display">{{ stats.total_users }}</span>
-            <span class="stat-label">Utilisateurs</span>
+            <span class="stat-label">{{ t('admin.stat_users') }}</span>
           </div>
-          <span class="stat-sub">+{{ stats.new_users_today }} aujourd'hui</span>
+          <span class="stat-sub">{{ t('admin.new_today').replace('{n}', stats.new_users_today) }}</span>
         </div>
         <div class="stat-card card">
           <div class="stat-icon">❓</div>
           <div class="stat-info">
             <span class="stat-num font-display">{{ stats.total_questions }}</span>
-            <span class="stat-label">Questions</span>
+            <span class="stat-label">{{ t('admin.stat_questions') }}</span>
           </div>
-          <span class="stat-sub">{{ stats.total_groups }} groupes</span>
+          <span class="stat-sub">{{ t('admin.groups_count').replace('{n}', stats.total_groups) }}</span>
         </div>
         <div class="stat-card card">
           <div class="stat-icon">🗳️</div>
           <div class="stat-info">
             <span class="stat-num font-display">{{ stats.total_votes }}</span>
-            <span class="stat-label">Votes</span>
+            <span class="stat-label">{{ t('admin.stat_votes') }}</span>
           </div>
-          <span class="stat-sub">+{{ stats.new_votes_today }} aujourd'hui</span>
+          <span class="stat-sub">{{ t('admin.new_today').replace('{n}', stats.new_votes_today) }}</span>
         </div>
         <div class="stat-card card">
           <div class="stat-icon">🚩</div>
           <div class="stat-info">
             <span class="stat-num font-display" :class="{ danger: stats.total_reports > 0 }">{{ stats.total_reports }}</span>
-            <span class="stat-label">Signalements</span>
+            <span class="stat-label">{{ t('admin.stat_reports') }}</span>
           </div>
-          <span class="stat-sub">{{ stats.banned_users }} bannis</span>
+          <span class="stat-sub">{{ stats.banned_users }} {{ t('admin.banned').toLowerCase() }}</span>
         </div>
         <div class="stat-card card">
           <div class="stat-icon">🙈</div>
           <div class="stat-info">
             <span class="stat-num font-display">{{ stats.hidden_posts }}</span>
-            <span class="stat-label">Posts masqués</span>
+            <span class="stat-label">{{ t('admin.stat_hidden') }}</span>
           </div>
-          <span class="stat-sub">{{ stats.total_likes }} likes total</span>
+          <span class="stat-sub">{{ t('admin.likes_total').replace('{n}', stats.total_likes) }}</span>
         </div>
       </div>
 
       <!-- Actions rapides -->
       <div class="quick-actions card">
-        <h2 class="font-display section-title">Actions rapides</h2>
+        <h2 class="font-display section-title">{{ t('admin.quick_actions') }}</h2>
         <div class="actions-row">
           <Link :href="route('admin.reports')" class="btn-primary" v-if="stats.total_reports > 0">
-            🚩 Traiter {{ stats.total_reports }} signalement{{ stats.total_reports > 1 ? 's' : '' }}
+            🚩 {{ tp('admin.handle_reports', stats.total_reports) }}
           </Link>
-          <Link :href="route('admin.users')" class="btn-ghost">👥 Gérer les utilisateurs</Link>
-          <Link :href="route('admin.posts')" class="btn-ghost">📝 Modérer les posts</Link>
-          <Link :href="route('admin.analytics')" class="btn-ghost">📈 Voir les analytics</Link>
+          <Link :href="route('admin.users')" class="btn-ghost">👥 {{ t('admin.manage_users') }}</Link>
+          <Link :href="route('admin.posts')" class="btn-ghost">📝 {{ t('admin.moderate_posts') }}</Link>
+          <Link :href="route('admin.analytics')" class="btn-ghost">📈 {{ t('admin.view_analytics') }}</Link>
         </div>
       </div>
     </div>
@@ -76,8 +76,10 @@
 <script setup>
 import { Link } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import { useI18n } from '@/Composables/useI18n'
 
 defineProps({ stats: Object })
+const { t, tp } = useI18n()
 const isRoute = (name) => route().current(name)
 </script>
 

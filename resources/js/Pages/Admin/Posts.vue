@@ -2,13 +2,13 @@
   <AppLayout>
     <div class="admin-layout">
       <div class="admin-header">
-        <h1 class="font-display admin-title">📝 Posts</h1>
+        <h1 class="font-display admin-title">📝 {{ t('admin.posts') }}</h1>
         <div class="admin-nav">
-          <Link :href="route('admin.index')"     class="admin-nav-btn">📊 Dashboard</Link>
-          <Link :href="route('admin.users')"     class="admin-nav-btn">👥 Utilisateurs</Link>
-          <Link :href="route('admin.posts')"     class="admin-nav-btn active">📝 Posts</Link>
-          <Link :href="route('admin.reports')"   class="admin-nav-btn">🚩 Signalements</Link>
-          <Link :href="route('admin.analytics')" class="admin-nav-btn">📈 Analytics</Link>
+          <Link :href="route('admin.index')"     class="admin-nav-btn">📊 {{ t('admin.dashboard') }}</Link>
+          <Link :href="route('admin.users')"     class="admin-nav-btn">👥 {{ t('admin.users') }}</Link>
+          <Link :href="route('admin.posts')"     class="admin-nav-btn active">📝 {{ t('admin.posts') }}</Link>
+          <Link :href="route('admin.reports')"   class="admin-nav-btn">🚩 {{ t('admin.reports') }}</Link>
+          <Link :href="route('admin.analytics')" class="admin-nav-btn">📈 {{ t('admin.analytics') }}</Link>
         </div>
       </div>
 
@@ -24,7 +24,7 @@
 
       <!-- Search -->
       <div class="search-bar">
-        <input v-model="search" type="text" class="field-input" placeholder="Rechercher..." @input="doSearch" />
+        <input v-model="search" type="text" class="field-input" :placeholder="t('admin.search_posts')" @input="doSearch" />
       </div>
 
       <!-- Questions table -->
@@ -32,24 +32,24 @@
         <table class="admin-table">
           <thead>
             <tr>
-              <th>Titre / Options</th>
-              <th>Catégorie</th>
-              <th>Auteur</th>
-              <th>Votes</th>
-              <th>Signalements</th>
-              <th>Date</th>
-              <th>Statut</th>
-              <th>Actions</th>
+              <th>{{ t('admin.col_title_options') }}</th>
+              <th>{{ t('admin.col_category') }}</th>
+              <th>{{ t('admin.col_author') }}</th>
+              <th>{{ t('admin.col_votes') }}</th>
+              <th>{{ t('admin.col_reports') }}</th>
+              <th>{{ t('admin.col_date') }}</th>
+              <th>{{ t('admin.col_status') }}</th>
+              <th>{{ t('admin.col_actions') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="q in questions.data" :key="q.id" :class="{ 'row-hidden': q.is_hidden }">
               <td>
-                <div class="post-title">{{ q.title || 'Sans titre' }}</div>
+                <div class="post-title">{{ q.title || t('admin.no_title') }}</div>
                 <div class="post-type-badge" :class="'type-' + q.type">{{ q.type }}</div>
               </td>
               <td><span class="cat-badge">{{ q.category }}</span></td>
-              <td class="text-muted">{{ q.author?.name ?? 'Anonyme' }}</td>
+              <td class="text-muted">{{ q.author?.name ?? t('question.anonymous') }}</td>
               <td class="text-center">{{ q.votes_count }}</td>
               <td class="text-center">
                 <span :class="{ 'text-red': q.reports_count > 0 }">{{ q.reports_count }}</span>
@@ -57,16 +57,16 @@
               <td class="text-muted">{{ q.created_at }}</td>
               <td>
                 <span class="status-badge" :class="q.is_hidden ? 'hidden' : 'visible'">
-                  {{ q.is_hidden ? '🙈 Masqué' : '👁️ Visible' }}
+                  {{ q.is_hidden ? '🙈 ' + t('admin.hidden') : '👁️ ' + t('admin.visible') }}
                 </span>
               </td>
               <td>
                 <div class="action-btns">
                   <button class="action-btn-sm btn-orange" @click="toggleHide(q.id, 'question')">
-                    {{ q.is_hidden ? 'Afficher' : 'Masquer' }}
+                    {{ q.is_hidden ? t('admin.show') : t('admin.hide') }}
                   </button>
                   <button class="action-btn-sm btn-red" @click="deletePost(q.id, 'question')">
-                    Supprimer
+                    {{ t('admin.delete') }}
                   </button>
                 </div>
               </td>
@@ -83,14 +83,14 @@
         <table class="admin-table">
           <thead>
             <tr>
-              <th>Titre</th>
-              <th>Type</th>
-              <th>Catégorie</th>
-              <th>Auteur</th>
-              <th>Signalements</th>
-              <th>Date</th>
-              <th>Statut</th>
-              <th>Actions</th>
+              <th>{{ t('admin.col_title_options') }}</th>
+              <th>{{ t('admin.col_type') }}</th>
+              <th>{{ t('admin.col_category') }}</th>
+              <th>{{ t('admin.col_author') }}</th>
+              <th>{{ t('admin.col_reports') }}</th>
+              <th>{{ t('admin.col_date') }}</th>
+              <th>{{ t('admin.col_status') }}</th>
+              <th>{{ t('admin.col_actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -98,21 +98,21 @@
               <td><div class="post-title">{{ g.title }}</div></td>
               <td><span class="post-type-badge" :class="'type-' + g.type">{{ g.type }}</span></td>
               <td><span class="cat-badge">{{ g.category }}</span></td>
-              <td class="text-muted">{{ g.author?.name ?? 'Anonyme' }}</td>
+              <td class="text-muted">{{ g.author?.name ?? t('question.anonymous') }}</td>
               <td class="text-center"><span :class="{ 'text-red': g.reports_count > 0 }">{{ g.reports_count }}</span></td>
               <td class="text-muted">{{ g.created_at }}</td>
               <td>
                 <span class="status-badge" :class="g.is_hidden ? 'hidden' : 'visible'">
-                  {{ g.is_hidden ? '🙈 Masqué' : '👁️ Visible' }}
+                  {{ g.is_hidden ? '🙈 ' + t('admin.hidden') : '👁️ ' + t('admin.visible') }}
                 </span>
               </td>
               <td>
                 <div class="action-btns">
                   <button class="action-btn-sm btn-orange" @click="toggleHide(g.id, g.type)">
-                    {{ g.is_hidden ? 'Afficher' : 'Masquer' }}
+                    {{ g.is_hidden ? t('admin.show') : t('admin.hide') }}
                   </button>
                   <button class="action-btn-sm btn-red" @click="deletePost(g.id, g.type)">
-                    Supprimer
+                    {{ t('admin.delete') }}
                   </button>
                 </div>
               </td>
@@ -158,7 +158,7 @@ const toggleHide = async (id, type) => {
     await axios.patch(route('admin.posts.hide', id), { type })
     toast(t('admin.post_updated'))
     router.reload()
-  } catch { toast('Erreur.', 'error') }
+  } catch { toast(t('common.error'), 'error') }
 }
 
 const deletePost = async (id, type) => {
@@ -167,7 +167,7 @@ const deletePost = async (id, type) => {
     await axios.delete(route('admin.posts.delete', id), { data: { type } })
     toast(t('admin.post_deleted'))
     router.reload()
-  } catch { toast('Erreur.', 'error') }
+  } catch { toast(t('common.error'), 'error') }
 }
 </script>
 

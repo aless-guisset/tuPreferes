@@ -3,19 +3,19 @@
     <div class="admin-layout">
       <!-- Header nav -->
       <div class="admin-header">
-        <h1 class="font-display admin-title">👥 Utilisateurs</h1>
+        <h1 class="font-display admin-title">👥 {{ t('admin.users') }}</h1>
         <div class="admin-nav">
-          <Link :href="route('admin.index')"     class="admin-nav-btn">📊 Dashboard</Link>
-          <Link :href="route('admin.users')"     class="admin-nav-btn active">👥 Utilisateurs</Link>
-          <Link :href="route('admin.posts')"     class="admin-nav-btn">📝 Posts</Link>
-          <Link :href="route('admin.reports')"   class="admin-nav-btn">🚩 Signalements</Link>
-          <Link :href="route('admin.analytics')" class="admin-nav-btn">📈 Analytics</Link>
+          <Link :href="route('admin.index')"     class="admin-nav-btn">📊 {{ t('admin.dashboard') }}</Link>
+          <Link :href="route('admin.users')"     class="admin-nav-btn active">👥 {{ t('admin.users') }}</Link>
+          <Link :href="route('admin.posts')"     class="admin-nav-btn">📝 {{ t('admin.posts') }}</Link>
+          <Link :href="route('admin.reports')"   class="admin-nav-btn">🚩 {{ t('admin.reports') }}</Link>
+          <Link :href="route('admin.analytics')" class="admin-nav-btn">📈 {{ t('admin.analytics') }}</Link>
         </div>
       </div>
 
       <!-- Search -->
       <div class="search-bar">
-        <input v-model="search" type="text" class="field-input" placeholder="Rechercher par nom ou email..." @input="doSearch" />
+        <input v-model="search" type="text" class="field-input" :placeholder="t('admin.search_users')" @input="doSearch" />
       </div>
 
       <!-- Table -->
@@ -23,14 +23,14 @@
         <table class="admin-table">
           <thead>
             <tr>
-              <th>Utilisateur</th>
-              <th>Email</th>
-              <th>Rôle</th>
-              <th>Questions</th>
-              <th>Votes</th>
-              <th>Inscrit le</th>
-              <th>Statut</th>
-              <th>Actions</th>
+              <th>{{ t('admin.col_user') }}</th>
+              <th>{{ t('admin.col_email') }}</th>
+              <th>{{ t('admin.col_role') }}</th>
+              <th>{{ t('admin.col_questions') }}</th>
+              <th>{{ t('admin.col_votes') }}</th>
+              <th>{{ t('admin.col_registered') }}</th>
+              <th>{{ t('admin.col_status') }}</th>
+              <th>{{ t('admin.col_actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -56,16 +56,16 @@
               <td class="text-muted">{{ user.created_at }}</td>
               <td>
                 <span class="status-badge" :class="user.banned ? 'banned' : 'active'">
-                  {{ user.banned ? '🔴 Banni' : '🟢 Actif' }}
+                  {{ user.banned ? '🔴 ' + t('admin.banned') : '🟢 ' + t('admin.active') }}
                 </span>
               </td>
               <td>
                 <div class="action-btns">
                   <button class="action-btn-sm" :class="user.banned ? 'btn-green' : 'btn-orange'" @click="toggleBan(user)">
-                    {{ user.banned ? 'Débannir' : 'Bannir' }}
+                    {{ user.banned ? t('admin.unban') : t('admin.ban') }}
                   </button>
                   <button class="action-btn-sm btn-red" @click="deleteUser(user)" v-if="user.id !== $page.props.auth.user.id">
-                    Supprimer
+                    {{ t('admin.delete') }}
                   </button>
                 </div>
               </td>
@@ -82,14 +82,14 @@
       <!-- Modal ban -->
       <div v-if="banModal.show" class="modal-overlay" @click.self="banModal.show = false">
         <div class="modal card">
-          <h3 class="font-display modal-title">Bannir {{ banModal.user?.name }}</h3>
+          <h3 class="font-display modal-title">{{ t('admin.ban_user_title') }} {{ banModal.user?.name }}</h3>
           <div class="field">
-            <label class="field-label">Raison (optionnel)</label>
-            <input v-model="banModal.reason" type="text" class="field-input" placeholder="Raison du bannissement..." />
+            <label class="field-label">{{ t('admin.ban_reason_optional') }}</label>
+            <input v-model="banModal.reason" type="text" class="field-input" :placeholder="t('admin.ban_reason')" />
           </div>
           <div class="modal-actions">
-            <button class="btn-ghost" @click="banModal.show = false">Annuler</button>
-            <button class="btn-primary" style="background:#ef4444" @click="confirmBan">Confirmer le ban</button>
+            <button class="btn-ghost" @click="banModal.show = false">{{ t('report.cancel') }}</button>
+            <button class="btn-primary" style="background:#ef4444" @click="confirmBan">{{ t('admin.ban_confirm_btn') }}</button>
           </div>
         </div>
       </div>
@@ -124,7 +124,7 @@ const updateRole = async (userId, role) => {
   try {
     await axios.patch(route('admin.users.role', userId), { role })
     toast(t('admin.role_updated'))
-  } catch { toast('Erreur.', 'error') }
+  } catch { toast(t('common.error'), 'error') }
 }
 
 const banModal = reactive({ show: false, user: null, reason: '' })
@@ -144,7 +144,7 @@ const confirmBanDirect = async (user) => {
     await axios.patch(route('admin.users.ban', user.id), { reason: '' })
     toast(t('admin.ban_lifted'))
     router.reload()
-  } catch { toast('Erreur.', 'error') }
+  } catch { toast(t('common.error'), 'error') }
 }
 
 const confirmBan = async () => {
@@ -153,7 +153,7 @@ const confirmBan = async () => {
     toast(t('admin.user_banned'))
     banModal.show = false
     router.reload()
-  } catch { toast('Erreur.', 'error') }
+  } catch { toast(t('common.error'), 'error') }
 }
 
 const deleteUser = async (user) => {
@@ -162,7 +162,7 @@ const deleteUser = async (user) => {
     await axios.delete(route('admin.users.delete', user.id))
     toast(t('admin.user_deleted'))
     router.reload()
-  } catch { toast('Erreur.', 'error') }
+  } catch { toast(t('common.error'), 'error') }
 }
 </script>
 
