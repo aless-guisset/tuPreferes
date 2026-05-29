@@ -1,4 +1,9 @@
-import { registerSW } from 'virtual:pwa-register'
+// Enregistrement manuel du SW à la racine (proxifié par Laravel depuis /build/sw.js)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {})
+    })
+}
 import { createInertiaApp } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import { createApp, h } from 'vue'
@@ -21,4 +26,3 @@ createInertiaApp({
     progress: { color: '#f97316' },
 })
 
-registerSW({ immediate: true })

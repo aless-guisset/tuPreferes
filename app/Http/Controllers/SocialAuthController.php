@@ -15,7 +15,9 @@ class SocialAuthController extends Controller
     public function redirect(string $provider): RedirectResponse
     {
         abort_unless(in_array($provider, ['google', 'apple']), 404);
-        return Socialite::driver($provider)->redirect();
+        return Socialite::driver($provider)
+            ->redirectUrl($this->callbackUrl($provider))
+            ->redirect();
     }
 
     /**
@@ -26,7 +28,9 @@ class SocialAuthController extends Controller
         abort_unless(in_array($provider, ['google', 'apple']), 404);
 
         try {
-            $socialUser = Socialite::driver($provider)->user();
+            $socialUser = Socialite::driver($provider)
+                ->redirectUrl($this->callbackUrl($provider))
+                ->user();
         } catch (\Exception $e) {
             return redirect()->route('login')
                 ->with('error', 'Connexion '.$provider.' échouée. Réessaie.');
@@ -73,6 +77,14 @@ class SocialAuthController extends Controller
 
         return redirect()->intended(route('questions.index'))
             ->with('success', 'Bienvenue '.$user->name.' !');
+    }
+
+    /**
+     * Construit l'URL de callback selon le domaine courant
+     */
+    private function callbackUrl(string $provider): string
+    {
+        return request()->getSchemeAndHttpHost() . '/auth/' . $provider . '/callback';
     }
 
     /**

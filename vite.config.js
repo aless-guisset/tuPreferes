@@ -20,10 +20,8 @@ export default defineConfig({
         }),
         VitePWA({
             registerType: 'autoUpdate',
-            injectRegister: 'null', // On enregistre manuellement dans app.js
-            outDir: resolve(__dirname, 'public'), // SW + manifest à la racine /
-            base: '/',
-            includeAssets: ['favicon.ico', 'icons/*.png'],
+            injectRegister: 'null',
+            includeAssets: ['icons/*.png'],
 
             manifest: {
                 name: 'TuPréfères',

@@ -5,6 +5,24 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuestionController;
 use Illuminate\Support\Facades\Route;
 
+// ─── PWA ─────────────────────────────────────────────────────────────────────
+
+Route::get('/sw.js', function () {
+    $path = public_path('build/sw.js');
+    abort_unless(file_exists($path), 404);
+    return response()->file($path, [
+        'Content-Type'          => 'application/javascript',
+        'Service-Worker-Allowed'=> '/',
+        'Cache-Control'         => 'no-cache',
+    ]);
+})->withoutMiddleware([\App\Http\Middleware\HandleInertiaRequests::class]);
+
+Route::get('/workbox-{hash}.js', function (string $hash) {
+    $path = public_path('build/workbox-'.$hash.'.js');
+    abort_unless(file_exists($path), 404);
+    return response()->file($path, ['Content-Type' => 'application/javascript']);
+})->withoutMiddleware([\App\Http\Middleware\HandleInertiaRequests::class]);
+
 // ─── Questions (publiques) ────────────────────────────────────────────────────
 
 Route::get('/', [QuestionController::class, 'index'])->name('questions.index');
