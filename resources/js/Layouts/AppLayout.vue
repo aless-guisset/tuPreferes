@@ -24,6 +24,11 @@
             <MoonIcon v-else />
           </button>
 
+          <!-- Télécharger l'app -->
+          <a href="/downloads/tuPreferes.apk" download class="btn-download" title="Télécharger l'app Android">
+            📲 <span class="download-label">App</span>
+          </a>
+
           <template v-if="$page.props.auth.user">
             <Link v-if="$page.props.auth.user.is_admin" :href="route('admin.index')" class="btn-ghost admin-btn">🛡️ Admin</Link>
             <Link :href="route('groups.create')" class="btn-primary">
@@ -85,6 +90,10 @@
           <img :src="$page.props.auth.user.avatar_url" class="mobile-avatar" />
           <span>{{ t('nav.profile') }}</span>
         </Link>
+        <a href="/downloads/tuPreferes.apk" download class="mobile-nav-btn">
+          <span style="font-size:1.2rem">📲</span>
+          <span>App</span>
+        </a>
       </template>
 
       <template v-else>
@@ -105,6 +114,10 @@
           <MoonIcon v-else />
           <span>{{ t('nav.theme_dark') }}</span>
         </button>
+        <a href="/downloads/tuPreferes.apk" download class="mobile-nav-btn">
+          <span style="font-size:1.2rem">📲</span>
+          <span>App</span>
+        </a>
       </template>
     </nav>
 
@@ -202,6 +215,10 @@ const focusSearch = computed(() => new URLSearchParams(window.location.search).h
   transition: border-color .2s;
 }
 .avatar-btn:hover { border-color: var(--color-accent); }
+.btn-download { display: flex; align-items: center; gap: .35rem; padding: .4rem .85rem; border: 1.5px solid var(--color-accent); border-radius: var(--radius-md); color: var(--color-accent); font-size: .8rem; font-weight: 600; text-decoration: none; transition: all .2s; white-space: nowrap; }
+.btn-download:hover { background: var(--color-accent); color: white; }
+.download-label { display: none; }
+@media (min-width: 900px) { .download-label { display: inline; } }
 .avatar-img { width: 100%; height: 100%; object-fit: cover; }
 
 /* ── Main content ────────────────────────────────────────────────────────── */
