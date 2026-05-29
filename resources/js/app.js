@@ -1,3 +1,4 @@
+import { registerSW } from 'virtual:pwa-register'
 import { createInertiaApp } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import { createApp, h } from 'vue'
@@ -19,3 +20,5 @@ createInertiaApp({
     },
     progress: { color: '#f97316' },
 })
+
+registerSW({ immediate: true })

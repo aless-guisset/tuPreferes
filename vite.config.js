@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite'
+import { resolve } from 'path'
 import laravel from 'laravel-vite-plugin'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -19,7 +20,9 @@ export default defineConfig({
         }),
         VitePWA({
             registerType: 'autoUpdate',
-            injectRegister: 'auto',
+            injectRegister: 'null', // On enregistre manuellement dans app.js
+            outDir: resolve(__dirname, 'public'), // SW + manifest à la racine /
+            base: '/',
             includeAssets: ['favicon.ico', 'icons/*.png'],
 
             manifest: {
