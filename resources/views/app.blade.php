@@ -3,8 +3,15 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#0f0f13" />
+    <meta name="theme-color" content="#f97316" />
     <meta name="description" content="TuPréfères — Lance des dilemmes et découvre les choix de la communauté !" />
+
+    <!-- PWA / Mobile -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="TuPréfères" />
+    <link rel="apple-touch-icon" href="/icons/pwa-192x192.png" />
 
     <title inertia>TuPréfères</title>
 

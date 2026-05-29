@@ -34,9 +34,9 @@
           <img :src="option.image" :alt="option.label" class="option-image" />
         </div>
         <div v-if="option.audio" class="option-audio">
-          <button class="audio-btn" @click.stop="toggleAudio(option.id, option.audio)">
+          <span class="audio-btn" role="button" tabindex="0" @click.stop="toggleAudio(option.id, option.audio)" @keydown.enter.stop="toggleAudio(option.id, option.audio)">
             {{ playingAudio === option.id ? '⏸' : '▶' }}
-          </button>
+          </span>
         </div>
         <span class="option-label">{{ option.label }}</span>
         <Transition name="stats">
@@ -56,7 +56,7 @@
 
     <Transition name="fade">
       <div v-if="localVote !== null" class="total-votes-row">
-        {{ localTotalVotes }} {{ tp('question.votes_total', localTotalVotes) }} au total
+        {{ tp('question.votes_total', localTotalVotes) }} au total
       </div>
     </Transition>
 
@@ -106,7 +106,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { useI18n } from '@/Composables/useI18n'
 import { Link, router, usePage } from '@inertiajs/vue3'
 import axios from 'axios'
@@ -204,10 +204,13 @@ const toggleAudio = (optionId, url) => {
   if (playingAudio.value === optionId) { audioEl?.pause(); playingAudio.value = null; return }
   audioEl?.pause()
   audioEl = new Audio(url)
-  audioEl.play()
+  audioEl.play().catch(() => { playingAudio.value = null })
   playingAudio.value = optionId
   audioEl.onended = () => { playingAudio.value = null }
+  audioEl.onerror = () => { playingAudio.value = null; toast(t('common.error'), 'error') }
 }
+
+onUnmounted(() => { audioEl?.pause(); audioEl = null })
 </script>
 
 <style scoped>

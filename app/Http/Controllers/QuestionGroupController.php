@@ -67,7 +67,7 @@ class QuestionGroupController extends Controller
     }
 
     private function storeSimple(Request $request): RedirectResponse {
-        $data = $request->validate(['title'=>['nullable','string','max:255'],'category'=>['required','string','in:amour,aventure,nourriture,technologie,voyage,sport,musique,cinéma,divers'],'is_anonymous'=>['boolean'],'options'=>['required','array','size:2'],'options.*.label'=>['required','string','max:255'],'options.*.image'=>['nullable','image','max:5120'],'options.*.audio'=>['nullable','mimes:mp3,wav,ogg,m4a','max:10240']]);
+        $data = $request->validate(['title'=>['nullable','string','max:255'],'category'=>['required','string','in:amour,aventure,nourriture,technologie,voyage,sport,musique,cinéma,divers'],'is_anonymous'=>['boolean'],'options'=>['required','array','size:2'],'options.*.label'=>['required','string','max:255'],'options.*.image'=>['nullable','image','max:5120'],'options.*.audio'=>['nullable','mimes:mp3,wav,ogg,m4a','max:30720']]);
         $q = Question::create(['user_id'=>Auth::id(),'title'=>$data['title']??null,'category'=>$data['category'],'is_anonymous'=>$data['is_anonymous']??false,'is_published'=>true,'question_type'=>'simple']);
         foreach ($data['options'] as $i=>$opt) {
             QuestionOption::create(['question_id'=>$q->id,'label'=>$opt['label'],'image'=>isset($opt['image'])&&$opt['image'] instanceof \Illuminate\Http\UploadedFile?$opt['image']->store('questions/images','public'):null,'audio'=>isset($opt['audio'])&&$opt['audio'] instanceof \Illuminate\Http\UploadedFile?$opt['audio']->store('questions/audio','public'):null,'order'=>$i]);
