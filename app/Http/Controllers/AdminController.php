@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 use App\Models\{Question,QuestionGroup,Report,User,Vote,Like};
-use Illuminate\Http\{JsonResponse,RedirectResponse,Request};
+use Illuminate\Http\{JsonResponse,Request};
 use Illuminate\Support\Facades\{Auth,DB};
 use Inertia\{Inertia,Response};
 
@@ -24,17 +24,17 @@ class AdminController extends Controller
             ->latest()
             ->paginate(20)
             ->through(fn($u) => [
-                'id'         => $u->id,
-                'name'       => $u->name,
-                'username'   => $u->username,
-                'email'      => $u->email,
-                'role'       => $u->role?->name,
-                'banned'     => $u->banned,
-                'ban_reason' => $u->ban_reason,
-                'avatar_url' => $u->avatar_url,
+                'id'              => $u->id,
+                'name'            => $u->name,
+                'username'        => $u->username,
+                'email'           => $this->maskEmail($u->email),
+                'role'            => $u->role?->name,
+                'banned'          => $u->banned,
+                'ban_reason'      => $u->ban_reason,
+                'avatar_url'      => $u->avatar_url,
                 'questions_count' => $u->questions_count,
                 'votes_count'     => $u->votes_count,
-                'created_at' => $u->created_at->format('d/m/Y'),
+                'created_at'      => $u->created_at->format('d/m/Y'),
             ]);
 
         return Inertia::render('Admin/Users', ['users' => $users, 'filters' => $request->only('search')]);
@@ -56,7 +56,7 @@ class AdminController extends Controller
                 'is_anonymous'  => $q->is_anonymous,
                 'votes_count'   => $q->votes_count,
                 'reports_count' => $q->reports_count,
-                'author'        => $q->user ? ['name'=>$q->user->name,'email'=>$q->user->email] : null,
+                'author'        => $q->user ? ['name'=>$q->user->name] : null,
                 'created_at'    => $q->created_at->format('d/m/Y'),
                 'type'          => 'question',
             ]);
@@ -74,7 +74,7 @@ class AdminController extends Controller
                 'is_anonymous'  => $g->is_anonymous,
                 'votes_count'   => 0,
                 'reports_count' => $g->reports_count,
-                'author'        => $g->user ? ['name'=>$g->user->name,'email'=>$g->user->email] : null,
+                'author'        => $g->user ? ['name'=>$g->user->name] : null,
                 'created_at'    => $g->created_at->format('d/m/Y'),
                 'type'          => $g->type,
             ]);
@@ -94,15 +94,15 @@ class AdminController extends Controller
             ->latest()
             ->paginate(20)
             ->through(fn($r) => [
-                'id'             => $r->id,
-                'reason'         => $r->reason,
-                'comment'        => $r->comment,
-                'status'         => $r->status,
-                'reportable_type'=> class_basename($r->reportable_type),
-                'reportable_id'  => $r->reportable_id,
+                'id'               => $r->id,
+                'reason'           => $r->reason,
+                'comment'          => $r->comment,
+                'status'           => $r->status,
+                'reportable_type'  => class_basename($r->reportable_type),
+                'reportable_id'    => $r->reportable_id,
                 'reportable_title' => $r->reportable?->title ?? 'Supprimé',
-                'reporter'       => ['name'=>$r->user->name,'email'=>$r->user->email],
-                'created_at'     => $r->created_at->format('d/m/Y H:i'),
+                'reporter'         => ['name'=>$r->user->name, 'email'=>$this->maskEmail($r->user->email)],
+                'created_at'       => $r->created_at->format('d/m/Y H:i'),
             ]);
 
         return Inertia::render('Admin/Reports', ['reports' => $reports]);
@@ -111,26 +111,17 @@ class AdminController extends Controller
     // ── Analytics ─────────────────────────────────────────────────────────────
     public function analytics(): Response
     {
-        // Inscriptions par jour (30 derniers jours)
         $registrations = User::select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as count'))
             ->where('created_at', '>=', now()->subDays(30))
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
+            ->groupBy('date')->orderBy('date')->get();
 
-        // Votes par jour
         $votes = Vote::select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as count'))
             ->where('created_at', '>=', now()->subDays(30))
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
+            ->groupBy('date')->orderBy('date')->get();
 
-        // Questions par jour
         $questions = Question::select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as count'))
             ->where('created_at', '>=', now()->subDays(30))
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
+            ->groupBy('date')->orderBy('date')->get();
 
         return Inertia::render('Admin/Analytics', [
             'stats'         => $this->getStats(),
@@ -141,48 +132,51 @@ class AdminController extends Controller
     }
 
     // ── Actions ───────────────────────────────────────────────────────────────
-    public function updateRole(Request $request, User $user): RedirectResponse
+    public function updateRole(Request $request, User $user): JsonResponse
     {
         abort_if($user->id === Auth::id(), 403, 'Impossible de changer son propre rôle.');
         $request->validate(['role' => ['required','in:user,admin']]);
         $role = DB::table('roles')->where('name', $request->role)->first();
+        abort_unless($role, 422, 'Rôle invalide.');
         $user->update(['role_id' => $role->id]);
-        return back()->with('success', 'Rôle mis à jour.');
+        return response()->json(['message' => 'Rôle mis à jour.']);
     }
 
-    public function banUser(Request $request, User $user): RedirectResponse
+    public function banUser(Request $request, User $user): JsonResponse
     {
         abort_if($user->id === Auth::id(), 403);
         $request->validate(['reason' => ['nullable','string','max:255']]);
-        $user->update([
-            'banned'     => !$user->banned,
-            'banned_at'  => !$user->banned ? now() : null,
-            'ban_reason' => !$user->banned ? $request->reason : null,
+        $nowBanning = !$user->banned;
+        DB::table('users')->where('id', $user->id)->update([
+            'banned'     => $nowBanning,
+            'banned_at'  => $nowBanning ? now() : null,
+            'ban_reason' => $nowBanning ? $request->reason : null,
+            'updated_at' => now(),
         ]);
-        return back()->with('success', $user->banned ? 'Utilisateur banni.' : 'Bannissement levé.');
+        return response()->json(['banned' => $nowBanning]);
     }
 
-    public function deleteUser(User $user): RedirectResponse
+    public function deleteUser(User $user): JsonResponse
     {
         abort_if($user->id === Auth::id(), 403);
         $user->delete();
-        return back()->with('success', 'Utilisateur supprimé.');
+        return response()->json(['message' => 'Utilisateur supprimé.']);
     }
 
-    public function hidePost(Request $request, int $id): RedirectResponse
+    public function hidePost(Request $request, int $id): JsonResponse
     {
         $type = $request->input('type', 'question');
         if ($type === 'question') {
             $post = Question::findOrFail($id);
-            $post->update(['is_hidden' => !$post->is_hidden, 'is_anonymous' => true]);
+            $post->update(['is_hidden' => !$post->is_hidden]);
         } else {
             $post = QuestionGroup::findOrFail($id);
-            $post->update(['is_hidden' => !$post->is_hidden, 'is_anonymous' => true]);
+            $post->update(['is_hidden' => !$post->is_hidden]);
         }
-        return back()->with('success', 'Post mis à jour.');
+        return response()->json(['is_hidden' => $post->fresh()->is_hidden]);
     }
 
-    public function deletePost(Request $request, int $id): RedirectResponse
+    public function deletePost(Request $request, int $id): JsonResponse
     {
         $type = $request->input('type', 'question');
         if ($type === 'question') {
@@ -190,10 +184,10 @@ class AdminController extends Controller
         } else {
             QuestionGroup::findOrFail($id)->delete();
         }
-        return back()->with('success', 'Post supprimé.');
+        return response()->json(['message' => 'Post supprimé.']);
     }
 
-    public function resolveReport(Request $request, Report $report): RedirectResponse
+    public function resolveReport(Request $request, Report $report): JsonResponse
     {
         $request->validate(['action' => ['required','in:resolve,reject']]);
         $report->update([
@@ -201,10 +195,18 @@ class AdminController extends Controller
             'resolved_by' => Auth::id(),
             'resolved_at' => now(),
         ]);
-        return back()->with('success', 'Signalement traité.');
+        return response()->json(['message' => 'Signalement traité.']);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
+    private function maskEmail(string $email): string
+    {
+        [$local, $domain] = explode('@', $email, 2);
+        $visible = substr($local, 0, 1);
+        $masked  = $visible . str_repeat('*', max(3, strlen($local) - 1));
+        return $masked . '@' . $domain;
+    }
+
     private function getStats(): array
     {
         return [
